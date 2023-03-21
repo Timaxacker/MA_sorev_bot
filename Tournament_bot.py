@@ -9,8 +9,10 @@ import Key
 
 bot = telebot.TeleBot('6262757409:AAHsjhCslfRa6kV1q-sZsE4gFgLPrfEAgME') # Определенние переменных
 answer = ''
+date = Key.date()
 
 information = {}
+competitors_db = {}
 
 
 @bot.message_handler(commands=["start"]) # Функция по обработке команды /start
@@ -92,11 +94,18 @@ def status(m):
 
         information[m.from_user.id].append(m.text.strip())
 
+        competitors_db[m.from_user.id] = date.encrypt(information[m.from_user.id])
+
         answer = str(information[m.from_user.id])
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
 
+        print(competitors_db)
+        print(information)
+        print(date.decrypt(competitors_db[m.from_user.id].copy()))
+
 bot.polling(none_stop=True, interval=0) # Запуск бота
+
 
 
 """
