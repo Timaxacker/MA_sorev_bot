@@ -7,7 +7,9 @@ from telebot import types
 import Key 
 
 
-bot = telebot.TeleBot('6262757409:AAHsjhCslfRa6kV1q-sZsE4gFgLPrfEAgME') # Определенние переменных
+
+
+bot = telebot.TeleBot(open('API.txt', 'r').read()) # Определенние переменных
 answer = ''
 date = Key.date()
 
