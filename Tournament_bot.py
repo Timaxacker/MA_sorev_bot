@@ -4,12 +4,14 @@
 
 import telebot
 from telebot import types
-import Key 
+import sqlite3
+from sqlite3 import Error
 import BDMS
-
+import Key 
 
 
 bot = telebot.TeleBot(open('API.txt', 'r').read()) # Определенние переменных
+connection = BDMS.create_connection("C:\\Users\\79112\\Desktop\\Rep\\MA_sorev_bot\\database.sqlite")
 answer = ''
 date = Key.date()
 
