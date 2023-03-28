@@ -19,6 +19,21 @@ information = {}
 competitors_db = {}
 
 
+create_competitors_table = """
+CREATE TABLE IF NOT EXISTS competitors (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  surname TEXT,
+  patronymic TEXT,
+  age INTEGER,
+  weight INTEGER,
+  status TEXT
+);
+"""
+
+BDMS.execute_query(connection, create_competitors_table)  
+
+
 @bot.message_handler(commands=["start"]) # Функция по обработке команды /start
 def start(m, res=False):
     information[m.from_user.id] = []
@@ -48,6 +63,9 @@ def fio(m):
         information[m.from_user.id].append(d)
     del(mas)
     
+
+    
+
     answer = "Напишите, пожалуйста, Ваш год рождения"
     bot.send_message(m.chat.id, answer)
     bot.register_next_step_handler(m, born_year)

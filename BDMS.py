@@ -29,3 +29,17 @@ def execute_read_query(connection, query):
         return result
     except Error as e:
         print(f"The error '{e}' occurred")
+
+
+create_competitors_table = """
+CREATE TABLE IF NOT EXISTS competitors (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  surname TEXT,
+  patronymic TEXT,
+  age INTEGER,
+  weight INTEGER,
+  status TEXT
+);
+"""
+
