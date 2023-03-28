@@ -43,3 +43,10 @@ CREATE TABLE IF NOT EXISTS competitors (
 );
 """
 
+
+add_id_in_competitors = """
+INSERT INTO
+  competitors (id)
+VALUES
+  (m.from_user.id);
+"""

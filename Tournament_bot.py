@@ -19,25 +19,19 @@ information = {}
 competitors_db = {}
 
 
-create_competitors_table = """
-CREATE TABLE IF NOT EXISTS competitors (
-  id INTEGER PRIMARY KEY,
-  name TEXT,
-  surname TEXT,
-  patronymic TEXT,
-  age INTEGER,
-  weight INTEGER,
-  status TEXT
-);
-"""
-
-BDMS.execute_query(connection, create_competitors_table)  
-
 
 @bot.message_handler(commands=["start"]) # Функция по обработке команды /start
 def start(m, res=False):
     information[m.from_user.id] = []
     
+    add_id_in_competitors = """
+    INSERT INTO
+        competitors (id)
+    VALUES
+        (m.from_user.id);
+    """
+    BDMS.execute_query(connection, add_id_in_competitors)
+
     bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО")
 
 
