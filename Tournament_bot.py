@@ -6,12 +6,12 @@ import telebot
 from telebot import types
 import sqlite3
 from sqlite3 import Error
-import BDMS
+import DBMS
 import Key 
 
 
 bot = telebot.TeleBot(open('API.txt', 'r').read()) # Определенние переменных
-connection = BDMS.create_connection("C:\\Users\\79112\\Desktop\\Rep\\MA_sorev_bot\\database.sqlite")
+connection = DBMS.create_connection("C:\\Users\\79112\\Desktop\\Rep\\MA_sorev_bot\\database.sqlite")
 answer = ''
 date = Key.date()
 
@@ -24,13 +24,9 @@ competitors_db = {}
 def start(m, res=False):
     information[m.from_user.id] = []
     
-    add_id_in_competitors = """
-    INSERT INTO
-        competitors (id)
-    VALUES
-        (m.from_user.id);
-    """
-    BDMS.execute_query(connection, add_id_in_competitors)
+    #user_id = m.from_user.id
+
+    DBMS.add_id_in_competitors(connection, (m.from_user.id, ))
 
     bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО")
 

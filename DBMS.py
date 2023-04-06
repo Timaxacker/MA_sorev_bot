@@ -4,17 +4,17 @@ from sqlite3 import Error
 def create_connection(path):
     connection = None
     try:
-        connection = sqlite3.connect(path)
+        connection = sqlite3.connect(path, check_same_thread=False)
     except Error as e:
         print(f"The error '{e}' occurred")
 
     return connection
 
 
-def execute_query(connection, query):
+def execute_query(connection, query, values):
     cursor = connection.cursor()
     try:
-        cursor.execute(query)
+        cursor.execute(query, values)
         connection.commit()
     except Error as e:
         print(f"The error '{e}' occurred")
@@ -44,9 +44,12 @@ CREATE TABLE IF NOT EXISTS competitors (
 """
 
 
-add_id_in_competitors = """
-INSERT INTO
-  competitors (id)
-VALUES
-  (m.from_user.id);
-"""
+def add_id_in_competitors(connection, user_id):
+    add_id_in_competitors = """
+    INSERT INTO
+        competitors (id)
+    VALUES
+        (?);
+    """
+    
+    execute_query(connection, add_id_in_competitors, user_id)
