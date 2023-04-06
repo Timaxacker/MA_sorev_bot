@@ -11,10 +11,19 @@ def create_connection(path):
     return connection
 
 
-def execute_query(connection, query, values):
+def execute_query_values(connection, query, values):
     cursor = connection.cursor()
     try:
         cursor.execute(query, values)
+        connection.commit()
+    except Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def execute_query(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
         connection.commit()
     except Error as e:
         print(f"The error '{e}' occurred")
@@ -45,11 +54,11 @@ CREATE TABLE IF NOT EXISTS competitors (
 
 
 def add_id_in_competitors(connection, user_id):
-    add_id_in_competitors = """
+    add_id_in_competitors_query = """
     INSERT INTO
         competitors (id)
     VALUES
         (?);
     """
     
-    execute_query(connection, add_id_in_competitors, user_id)
+    execute_query_values(connection, add_id_in_competitors_query, user_id)
