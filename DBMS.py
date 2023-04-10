@@ -53,12 +53,25 @@ CREATE TABLE IF NOT EXISTS competitors (
 """
 
 
-def add_id_in_competitors(connection, user_id):
-    add_id_in_competitors_query = """
+def add_information_in_competitors(connection, info):
+    add_information_in_competitors_query = """
     INSERT INTO
-        competitors (id)
+        competitors (id, surname, name, patronymic, age, weight, status)
     VALUES
-        (?);
+        (?, ?, ?, ?, ?, ?, ?);
     """
     
-    execute_query_values(connection, add_id_in_competitors_query, user_id)
+    execute_query_values(connection, add_information_in_competitors_query, info)
+
+
+"""
+def add_name_surname_patronymic_in_competitors(connection, fio):
+    add_name_surname_patronymic_in_competitors_query = 
+    INSERT INTO
+        competitors (name, surname, patronymic)
+    VALUES
+        (???);
+    
+    
+    execute_query_values(connection, add_name_surname_patronymic_in_competitors_query, fio)
+"""

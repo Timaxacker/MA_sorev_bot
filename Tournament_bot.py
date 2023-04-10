@@ -10,7 +10,7 @@ import DBMS
 import Key 
 
 
-bot = telebot.TeleBot(open('API.txt', 'r').read()) # Определенние переменных
+bot = telebot.TeleBot(open('API.txt', 'r').read())
 connection = DBMS.create_connection("C:\\Users\\79112\\Desktop\\Rep\\MA_sorev_bot\\database.sqlite")
 answer = ''
 date = Key.date()
@@ -18,20 +18,19 @@ date = Key.date()
 information = {}
 competitors_db = {}
 
+delete_comment = "DELETE FROM competitors WHERE id > 0"
+DBMS.execute_query(connection, delete_comment)
 
-
-@bot.message_handler(commands=["start"]) # Функция по обработке команды /start
+@bot.message_handler(commands=["start"]) 
 def start(m, res=False):
     information[m.from_user.id] = []
-    
-    #user_id = m.from_user.id
 
-    DBMS.add_id_in_competitors(connection, (m.from_user.id, ))
+    #DBMS.add_id_in_competitors(connection, (m.from_user.id, ))
 
     bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО")
 
 
-@bot.message_handler(content_types=["text"]) # Функция по обработке кнопок
+@bot.message_handler(content_types=["text"]) 
 def fio(m):
     global answer
 
@@ -53,9 +52,7 @@ def fio(m):
         information[m.from_user.id].append(d)
     del(mas)
     
-
     
-
     answer = "Напишите, пожалуйста, Ваш год рождения"
     bot.send_message(m.chat.id, answer)
     bot.register_next_step_handler(m, born_year)
@@ -112,11 +109,14 @@ def status(m):
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
 
+        info = (m.from_user.id, ) +  tuple(information[m.from_user.id])
+        DBMS.add_information_in_competitors(connection, info)
+
         print(competitors_db)
         print(information)
         print(date.decrypt(competitors_db[m.from_user.id].copy()))
 
-bot.polling(none_stop=True, interval=0) # Запуск бота
+bot.polling(none_stop=True, interval=0) 
 
 
 
