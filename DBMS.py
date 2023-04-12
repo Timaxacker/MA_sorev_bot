@@ -43,8 +43,8 @@ def execute_read_query(connection, query):
 create_competitors_table = """
 CREATE TABLE IF NOT EXISTS competitors (
   id INTEGER PRIMARY KEY,
-  name TEXT,
   surname TEXT,
+  name TEXT,
   patronymic TEXT,
   age INTEGER,
   weight INTEGER,
@@ -62,16 +62,3 @@ def add_information_in_competitors(connection, info):
     """
     
     execute_query_values(connection, add_information_in_competitors_query, info)
-
-
-"""
-def add_name_surname_patronymic_in_competitors(connection, fio):
-    add_name_surname_patronymic_in_competitors_query = 
-    INSERT INTO
-        competitors (name, surname, patronymic)
-    VALUES
-        (???);
-    
-    
-    execute_query_values(connection, add_name_surname_patronymic_in_competitors_query, fio)
-"""

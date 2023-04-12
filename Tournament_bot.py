@@ -116,6 +116,12 @@ def status(m):
         print(information)
         print(date.decrypt(competitors_db[m.from_user.id].copy()))
 
+        select_competitors = "SELECT * from competitors"
+        competitors = DBMS.execute_read_query(connection, select_competitors)
+
+        for competitor in competitors:
+            print(competitor)
+
 bot.polling(none_stop=True, interval=0) 
 
 
