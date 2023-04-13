@@ -4,8 +4,6 @@
 
 import telebot
 from telebot import types
-import sqlite3
-from sqlite3 import Error
 import DBMS
 import Key 
 
@@ -20,6 +18,9 @@ competitors_db = {}
 
 delete_comment = "DELETE FROM competitors WHERE id > 0"
 DBMS.execute_query(connection, delete_comment)
+
+with open('input.txt', 'w', encoding = 'UTF-8') as f:
+    print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Год рождения", "Вес", "Категория"), file = f)
 
 @bot.message_handler(commands=["start"]) 
 def start(m, res=False):
@@ -118,9 +119,18 @@ def status(m):
 
         select_competitors = "SELECT * from competitors"
         competitors = DBMS.execute_read_query(connection, select_competitors)
+        try:
+            if information[1835294966][4] == 777:
+                with open('input.txt', 'a', encoding = 'UTF-8') as f:
+                    for competitor in competitors:
+                        for i in range(len(competitor)):
+                            print('%-15s' % competitor[i], end='', file = f)
+                        print(file = f)
+        except: pass
 
-        for competitor in competitors:
-            print(competitor)
+
+
+        
 
 bot.polling(none_stop=True, interval=0) 
 
