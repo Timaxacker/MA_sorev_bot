@@ -26,9 +26,7 @@ with open('input.txt', 'w', encoding = 'UTF-8') as f:
 def start(m, res=False):
     information[m.from_user.id] = []
 
-    #DBMS.add_id_in_competitors(connection, (m.from_user.id, ))
-
-    bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО")
+    bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО\n(Иванов Иван Иванович)")
 
 
 @bot.message_handler(content_types=["text"]) 
@@ -54,7 +52,7 @@ def fio(m):
     del(mas)
     
     
-    answer = "Напишите, пожалуйста, Ваш год рождения"
+    answer = "Напишите, пожалуйста, Ваш год рождения\n(2007)"
     bot.send_message(m.chat.id, answer)
     bot.register_next_step_handler(m, born_year)
 
@@ -64,32 +62,40 @@ def born_year(m):
 
     try:
         information[m.from_user.id].append(int(m.text.strip()))
+        
+        answer = "Напишите, пожалуйста, Ваш вес\n(60)"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, weight)
+    
     except:
-        information[m.from_user.id].append(m.text.strip())
-
-    answer = "Напишите, пожалуйста, Ваш вес"
-    bot.send_message(m.chat.id, answer)
-    bot.register_next_step_handler(m, weight)
+        answer = "Год рождения введен некорректно! Попытайтесь еще раз.\n(Пример: 2007)"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, born_year)
 
 
 def weight(m):
     global answer
     try:
         information[m.from_user.id].append(int(float(m.text.strip())))
+
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1=types.KeyboardButton("Новичок")
+        markup.add(item1)
+        item2=types.KeyboardButton("Опытный")
+        markup.add(item2)
+        item3=types.KeyboardButton("Эксперт")
+        markup.add(item3)
+
+        answer = "Напишите, пожалуйста, Вашу категорию"
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, status)
+    
     except:
-        information[m.from_user.id].append(m.text.strip())
+        answer = "Вес введен некорректно! Попытайтесь еще раз.\n(Пример: 60)"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, weight)
 
-    markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-    item1=types.KeyboardButton("Новичок")
-    markup.add(item1)
-    item2=types.KeyboardButton("Опытный")
-    markup.add(item2)
-    item3=types.KeyboardButton("Эксперт")
-    markup.add(item3)
-
-    answer = "Напишите, пожалуйста, Вашу категорию"
-    bot.send_message(m.chat.id, answer, reply_markup=markup)
-    bot.register_next_step_handler(m, status)
+    
 
 
 def status(m):
