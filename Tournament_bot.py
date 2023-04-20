@@ -71,14 +71,21 @@ def fio(m):
         mas.append(p)
     del(p, mess)
 
-    for d in mas:
-        information[m.from_user.id].append(d)
-    del(mas)
+    if len(mas) != 3:
+        answer = "ФИО введен некорректно! Попытайтесь еще раз. Вводите ФИО в три слова через пробел.\n(Пример: Иванов Иван Иванович)" 
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, fio)
+
+    else:
+
+        for d in mas:
+            information[m.from_user.id].append(d)
+        del(mas)
     
     
-    answer = "Напишите, пожалуйста, Ваш год рождения\n(2007)"
-    bot.send_message(m.chat.id, answer)
-    bot.register_next_step_handler(m, born_year)
+        answer = "Напишите, пожалуйста, Ваш год рождения\n(2007)"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, born_year)
 
 
 def born_year(m):
