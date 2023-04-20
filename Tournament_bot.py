@@ -24,12 +24,36 @@ with open('input.txt', 'w', encoding = 'UTF-8') as f:
 
 @bot.message_handler(commands=["start"]) 
 def start(m, res=False):
-    information[m.from_user.id] = []
+    if m.from_user.id == 1835294966:
+        answer = "Код:"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, admin_code)
 
-    bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО\n(Иванов Иван Иванович)")
+    else:
+        information[m.from_user.id] = []
+        bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО\n(Иванов Иван Иванович)")
+        bot.register_next_step_handler(m, fio)
 
 
 @bot.message_handler(content_types=["text"]) 
+def admin_code(m):
+    if m.text.strip() == '777':
+        answer = "Вы перешли в режим БОГАААААА!!!"
+
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1=types.KeyboardButton("Вывести бд в файл")
+        markup.add(item1)
+
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, admin_menu)
+        
+    else:
+        information[m.from_user.id] = []
+        answer = "Пароль неверный(\nФИО"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, fio)
+
+
 def fio(m):
     global answer
 
@@ -86,7 +110,7 @@ def weight(m):
         item3=types.KeyboardButton("Эксперт")
         markup.add(item3)
 
-        answer = "Напишите, пожалуйста, Вашу категорию"
+        answer = "Выберите, пожалуйста, Вашу категорию"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, status)
     
@@ -123,18 +147,28 @@ def status(m):
         print(information)
         print(date.decrypt(competitors_db[m.from_user.id].copy()))
 
+        
+        
+
+
+
+def admin_menu(m):
+    if m.text.strip() == 'Вывести бд в файл':
         select_competitors = "SELECT * from competitors"
         competitors = DBMS.execute_read_query(connection, select_competitors)
+        
         try:
-            if information[1835294966][4] == 777:
-                with open('input.txt', 'a', encoding = 'UTF-8') as f:
-                    for competitor in competitors:
-                        for i in range(len(competitor)):
-                            print('%-15s' % competitor[i], end='', file = f)
-                        print(file = f)
-        except: pass
+            with open('input.txt', 'a', encoding = 'UTF-8') as f:
+                for competitor in competitors:
+                    for i in range(len(competitor)):
+                        print('%-15s' % competitor[i], end='', file = f)
+                    print(file = f)
+        except: print("Error")
 
-
+    else:
+        answer = "Нажимай на кнопки!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, admin_menu)
 
         
 
