@@ -31,7 +31,8 @@ def start(m, res=False):
 
     else:
         information[m.from_user.id] = []
-        bot.send_message(m.chat.id, "Здравствуйте. Напишите, пожалуйста, Ваше ФИО\n(Иванов Иван Иванович)")
+        answer = "Здравствуйте. Напишите, пожалуйста, Ваше ФИО\n(Иванов Иван Иванович)"
+        bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
 
 
@@ -127,8 +128,6 @@ def weight(m):
         bot.register_next_step_handler(m, weight)
 
     
-
-
 def status(m):
     global answer
 
@@ -143,23 +142,73 @@ def status(m):
 
         competitors_db[m.from_user.id] = date.encrypt(information[m.from_user.id])
 
-        answer = str(information[m.from_user.id])
-        bot.send_message(m.chat.id, answer)
-        bot.register_next_step_handler(m, fio)
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1=types.KeyboardButton("Всё корректно")
+        markup.add(item1)
+        item2=types.KeyboardButton("Не всё корректно")
+        markup.add(item2)
 
+        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nГод рождения: {information[m.from_user.id][3]}\nВес: {information[m.from_user.id][4]}\nКатегория: {information[m.from_user.id][5]}"
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, check)
+
+        
+
+        
+def check(m):
+    global answer
+
+    if m.text.strip() == 'Всё корректно':
         info = (m.from_user.id, ) +  tuple(information[m.from_user.id])
         DBMS.add_information_in_competitors(connection, info)
+        print(DBMS.error)
 
-        print(competitors_db)
-        print(information)
-        print(date.decrypt(competitors_db[m.from_user.id].copy()))
+        if DBMS.error == True:
+            answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
+            bot.send_message(m.chat.id, answer)
+
+            answer = "Нажмите на /start"
+            bot.send_message(m.chat.id, answer)
+            
+
+
+        else:
+            answer = "Вы успешно зарегестрировались"
+            bot.send_message(m.chat.id, answer)
+    
+
+    elif m.text.strip() == 'Не всё корректно':
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1=types.KeyboardButton("Фамилия")
+        markup.add(item1)
+        item2=types.KeyboardButton("Имя")
+        markup.add(item2)
+        item2=types.KeyboardButton("Отчество")
+        markup.add(item2)
+        item2=types.KeyboardButton("Год рождения")
+        markup.add(item2)
+        item2=types.KeyboardButton("Вес")
+        markup.add(item2)
+        item2=types.KeyboardButton("Категория")
+        markup.add(item2)
+
+        answer = "Что именно некорректно?"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, check)
+
+    
+    else:
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, check)
+
 
         
-        
-
 
 
 def admin_menu(m):
+    global answer
+
     if m.text.strip() == 'Вывести бд в файл':
         select_competitors = "SELECT * from competitors"
         competitors = DBMS.execute_read_query(connection, select_competitors)

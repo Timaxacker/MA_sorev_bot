@@ -1,6 +1,8 @@
 import sqlite3
 from sqlite3 import Error
 
+
+
 def create_connection(path):
     connection = None
     try:
@@ -12,11 +14,15 @@ def create_connection(path):
 
 
 def execute_query_values(connection, query, values):
+    global error
+    error = False
+    
     cursor = connection.cursor()
     try:
         cursor.execute(query, values)
         connection.commit()
     except Error as e:
+        error = True
         print(f"The error '{e}' occurred")
 
 
@@ -40,6 +46,7 @@ def execute_read_query(connection, query):
         print(f"The error '{e}' occurred")
 
 
+
 create_competitors_table = """
 CREATE TABLE IF NOT EXISTS competitors (
   id INTEGER PRIMARY KEY,
@@ -51,6 +58,7 @@ CREATE TABLE IF NOT EXISTS competitors (
   status TEXT
 );
 """
+
 
 
 def add_information_in_competitors(connection, info):
