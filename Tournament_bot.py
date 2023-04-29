@@ -328,6 +328,9 @@ def admin_menu(m):
                     for i in range(len(competitor)):
                         print('%-15s' % competitor[i], end='', file = f)
                     print(file = f)
+
+            with open('input.txt', 'rb') as f: bot.send_document(m.chat.id, f)
+
         except: print("Error")
 
     else:
