@@ -16,11 +16,10 @@ date = Key.date()
 information = {}
 competitors_db = {}
 
-delete_comment = "DELETE FROM competitors WHERE id > 0"
-DBMS.execute_query(connection, delete_comment)
+DBMS.execute_query(connection, DBMS.delete_comment)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
-    print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Год рождения", "Вес", "Категория"), file = f)
+    print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
 
 @bot.message_handler(commands=["start"]) 
 def start(m, res=False):
@@ -81,11 +80,29 @@ def fio(m):
             information[m.from_user.id].append(d)
         del(mas)
     
-    
+
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1=types.KeyboardButton("Мужской")
+        markup.add(item1)
+        item2=types.KeyboardButton("Женский")
+        markup.add(item2)
+
+        answer = "Выберите, пожалуйста, Ваш пол"
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, sex)
+
+def sex(m):
+    if m.text.strip() in ["Мужской", "Женский"]:
+        information[m.from_user.id].append(m.text.strip())
+
         answer = "Напишите, пожалуйста, Ваш год рождения\n(2007)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, born_year)
 
+    else:
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, sex)
 
 def born_year(m):
     try:
@@ -124,13 +141,7 @@ def weight(m):
 
     
 def status(m):
-    if not(m.text.strip() in ["Новичок", "Опытный", "Эксперт"]):
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
-        bot.register_next_step_handler(m, status)
-
-    else:
-
+    if m.text.strip() in ["Новичок", "Опытный", "Эксперт"]:
         information[m.from_user.id].append(m.text.strip())
 
         competitors_db[m.from_user.id] = date.encrypt(information[m.from_user.id])
@@ -141,9 +152,16 @@ def status(m):
         item2=types.KeyboardButton("Не всё корректно")
         markup.add(item2)
 
-        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nГод рождения: {information[m.from_user.id][3]}\nВес: {information[m.from_user.id][4]}\nКатегория: {information[m.from_user.id][5]}"
+        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nКатегория: {information[m.from_user.id][6]}"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, check)
+        
+
+    else:
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, status)
+        
   
      
 def check(m):
@@ -174,12 +192,14 @@ def check(m):
         markup.add(item2)
         item3=types.KeyboardButton("Отчество")
         markup.add(item3)
-        item4=types.KeyboardButton("Год рождения")
+        item4=types.KeyboardButton("Пол")
         markup.add(item4)
-        item5=types.KeyboardButton("Вес")
+        item5=types.KeyboardButton("Год рождения")
         markup.add(item5)
-        item6=types.KeyboardButton("Категория")
+        item6=types.KeyboardButton("Вес")
         markup.add(item6)
+        item7=types.KeyboardButton("Категория")
+        markup.add(item7)
 
         answer = "Что именно некорректно?"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -196,17 +216,28 @@ def criter(m):
     global new_value_ind
     new_value_ind = None
 
-    if m.text.strip() == 'Категория':
-        new_value_ind = 5
+    if m.text.strip() in ["Пол", "Категория"]:
+        if m.text.strip() == 'Пол':
         
-        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1=types.KeyboardButton("Новичок")
-        markup.add(item1)
-        item2=types.KeyboardButton("Опытный")
-        markup.add(item2)
-        item3=types.KeyboardButton("Эксперт")
-        markup.add(item3)
+            new_value_ind = 3
         
+            markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+            item1=types.KeyboardButton("Мужской")
+            markup.add(item1)
+            item2=types.KeyboardButton("Женский")
+            markup.add(item2)
+        
+        elif m.text.strip() == 'Категория':
+            new_value_ind = 6
+        
+            markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+            item1=types.KeyboardButton("Новичок")
+            markup.add(item1)
+            item2=types.KeyboardButton("Опытный")
+            markup.add(item2)
+            item3=types.KeyboardButton("Эксперт")
+            markup.add(item3)
+
         answer = "Выберите новое значение"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, new_value)
@@ -231,7 +262,7 @@ def new_value(m):
     if new_value_ind in [0, 1, 2]:
         information[m.from_user.id][new_value_ind] = m.text.strip()
 
-    elif new_value_ind == 3:
+    elif new_value_ind == 4:
         try:
             information[m.from_user.id][new_value_ind] = int(m.text.strip())
         
@@ -240,7 +271,7 @@ def new_value(m):
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, new_value)
 
-    elif new_value_ind == 4:
+    elif new_value_ind == 5:
         try:
             information[m.from_user.id][new_value_ind] = int(float(m.text.strip()))
         
@@ -249,14 +280,23 @@ def new_value(m):
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, new_value)
 
-    elif new_value_ind == 5:
-        if not(m.text.strip() in ["Новичок", "Опытный", "Эксперт"]):
+    elif new_value_ind == 3:
+        if m.text.strip() in ["Мужской", "Женский"]:
+            information[m.from_user.id][new_value_ind] = m.text.strip()
+        
+        else:
             answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, new_value)
 
-        else:
+    elif new_value_ind == 6:
+        if m.text.strip() in ["Новичок", "Опытный", "Эксперт"]:
             information[m.from_user.id][new_value_ind] = m.text.strip()
+
+        else:
+            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer)
+            bot.register_next_step_handler(m, new_value)
 
     else:
         answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
@@ -272,7 +312,7 @@ def new_value(m):
     item2=types.KeyboardButton("Не всё корректно")
     markup.add(item2)
 
-    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nГод рождения: {information[m.from_user.id][3]}\nВес: {information[m.from_user.id][4]}\nКатегория: {information[m.from_user.id][5]}"
+    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nКатегория: {information[m.from_user.id][6]}"
     bot.send_message(m.chat.id, answer, reply_markup=markup)
     bot.register_next_step_handler(m, check)
 
@@ -280,8 +320,7 @@ def new_value(m):
 
 def admin_menu(m):
     if m.text.strip() == 'Вывести бд в файл':
-        select_competitors = "SELECT * from competitors"
-        competitors = DBMS.execute_read_query(connection, select_competitors)
+        competitors = DBMS.execute_read_query(connection, DBMS.select_competitors)
         
         try:
             with open('input.txt', 'a', encoding = 'UTF-8') as f:

@@ -53,20 +53,25 @@ CREATE TABLE IF NOT EXISTS competitors (
   surname TEXT,
   name TEXT,
   patronymic TEXT,
+  sex TEXT,
   age INTEGER,
   weight INTEGER,
   status TEXT
 );
 """
 
+delete_comment = "DELETE FROM competitors WHERE id > 0"
+
+select_competitors = "SELECT * from competitors"
+
 
 
 def add_information_in_competitors(connection, info):
     add_information_in_competitors_query = """
     INSERT INTO
-        competitors (id, surname, name, patronymic, age, weight, status)
+        competitors (id, surname, name, patronymic, sex, age, weight, status)
     VALUES
-        (?, ?, ?, ?, ?, ?, ?);
+        (?, ?, ?, ?, ?, ?, ?, ?);
     """
     
     execute_query_values(connection, add_information_in_competitors_query, info)
