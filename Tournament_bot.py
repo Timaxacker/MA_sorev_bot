@@ -56,8 +56,6 @@ def admin_code(m):
 
 
 def fio(m):
-    global answer
-
     mess = m.text.strip()
     mas = []
     p = ""
@@ -90,8 +88,6 @@ def fio(m):
 
 
 def born_year(m):
-    global answer
-
     try:
         information[m.from_user.id].append(int(m.text.strip()))
         
@@ -106,7 +102,6 @@ def born_year(m):
 
 
 def weight(m):
-    global answer
     try:
         information[m.from_user.id].append(int(float(m.text.strip())))
 
@@ -129,8 +124,6 @@ def weight(m):
 
     
 def status(m):
-    global answer
-
     if not(m.text.strip() in ["Новичок", "Опытный", "Эксперт"]):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
@@ -154,12 +147,10 @@ def status(m):
   
      
 def check(m):
-    global answer
-
     if m.text.strip() == 'Всё корректно':
         info = (m.from_user.id, ) +  tuple(information[m.from_user.id])
         DBMS.add_information_in_competitors(connection, info)
-        print(DBMS.error)
+        #print(DBMS.error)
 
         if DBMS.error == True:
             answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
@@ -202,24 +193,92 @@ def check(m):
 
 
 def criter(m):
-    global answer
-    lst = ["Фамилия", "Имя", "Отчество", "Год рождения", "Вес", "Категория"]
-    for i in range(6):
-        if m.text.strip() == lst[i]:
-            answer = "Напишите новое значение"
-            bot.send_message(m.chat.id, answer)
-            bot.register_next_step_handler(m, criter)
+    global new_value_ind
+    new_value_ind = None
+
+    if m.text.strip() == 'Категория':
+        new_value_ind = 5
+        
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        item1=types.KeyboardButton("Новичок")
+        markup.add(item1)
+        item2=types.KeyboardButton("Опытный")
+        markup.add(item2)
+        item3=types.KeyboardButton("Эксперт")
+        markup.add(item3)
+        
+        answer = "Выберите новое значение"
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, new_value)
 
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
-        bot.register_next_step_handler(m, criter)
+        lst = ["Фамилия", "Имя", "Отчество", "Год рождения", "Вес"]
+        for i in range(len(lst)):
+            if m.text.strip() == lst[i]:
+                new_value_ind = i
+                answer = "Напишите новое значение"
+                bot.send_message(m.chat.id, answer)
+                bot.register_next_step_handler(m, new_value)
+                break
+
+        else:
+            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer)
+            bot.register_next_step_handler(m, criter)
         
+
+def new_value(m):
+    if new_value_ind in [0, 1, 2]:
+        information[m.from_user.id][new_value_ind] = m.text.strip()
+
+    elif new_value_ind == 3:
+        try:
+            information[m.from_user.id][new_value_ind] = int(m.text.strip())
+        
+        except:
+            answer = "Год рождения введен некорректно! Попытайтесь еще раз.\n(Пример: 2007)"
+            bot.send_message(m.chat.id, answer)
+            bot.register_next_step_handler(m, new_value)
+
+    elif new_value_ind == 4:
+        try:
+            information[m.from_user.id][new_value_ind] = int(float(m.text.strip()))
+        
+        except:
+            answer = "Вес введен некорректно! Попытайтесь еще раз.\n(Пример: 60)"
+            bot.send_message(m.chat.id, answer)
+            bot.register_next_step_handler(m, new_value)
+
+    elif new_value_ind == 5:
+        if not(m.text.strip() in ["Новичок", "Опытный", "Эксперт"]):
+            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer)
+            bot.register_next_step_handler(m, new_value)
+
+        else:
+            information[m.from_user.id][new_value_ind] = m.text.strip()
+
+    else:
+        answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
+        bot.send_message(m.chat.id, answer)
+
+        answer = "Нажмите на /start"
+        bot.send_message(m.chat.id, answer)
+
+
+    markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1=types.KeyboardButton("Всё корректно")
+    markup.add(item1)
+    item2=types.KeyboardButton("Не всё корректно")
+    markup.add(item2)
+
+    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nГод рождения: {information[m.from_user.id][3]}\nВес: {information[m.from_user.id][4]}\nКатегория: {information[m.from_user.id][5]}"
+    bot.send_message(m.chat.id, answer, reply_markup=markup)
+    bot.register_next_step_handler(m, check)
+
 
 
 def admin_menu(m):
-    global answer
-
     if m.text.strip() == 'Вывести бд в файл':
         select_competitors = "SELECT * from competitors"
         competitors = DBMS.execute_read_query(connection, select_competitors)
