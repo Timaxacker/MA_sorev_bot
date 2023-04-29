@@ -151,10 +151,8 @@ def status(m):
         answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nГод рождения: {information[m.from_user.id][3]}\nВес: {information[m.from_user.id][4]}\nКатегория: {information[m.from_user.id][5]}"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, check)
-
-        
-
-        
+  
+     
 def check(m):
     global answer
 
@@ -183,18 +181,18 @@ def check(m):
         markup.add(item1)
         item2=types.KeyboardButton("Имя")
         markup.add(item2)
-        item2=types.KeyboardButton("Отчество")
-        markup.add(item2)
-        item2=types.KeyboardButton("Год рождения")
-        markup.add(item2)
-        item2=types.KeyboardButton("Вес")
-        markup.add(item2)
-        item2=types.KeyboardButton("Категория")
-        markup.add(item2)
+        item3=types.KeyboardButton("Отчество")
+        markup.add(item3)
+        item4=types.KeyboardButton("Год рождения")
+        markup.add(item4)
+        item5=types.KeyboardButton("Вес")
+        markup.add(item5)
+        item6=types.KeyboardButton("Категория")
+        markup.add(item6)
 
         answer = "Что именно некорректно?"
-        bot.send_message(m.chat.id, answer)
-        bot.register_next_step_handler(m, check)
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, criter)
 
     
     else:
@@ -203,6 +201,19 @@ def check(m):
         bot.register_next_step_handler(m, check)
 
 
+def criter(m):
+    global answer
+    lst = ["Фамилия", "Имя", "Отчество", "Год рождения", "Вес", "Категория"]
+    for i in range(6):
+        if m.text.strip() == lst[i]:
+            answer = "Напишите новое значение"
+            bot.send_message(m.chat.id, answer)
+            bot.register_next_step_handler(m, criter)
+
+    else:
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, criter)
         
 
 
