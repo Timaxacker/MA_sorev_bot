@@ -10,7 +10,6 @@ import Key
 
 
 
-
 bot = telebot.TeleBot(open('API.txt', 'r').read())
 connection = DBMS.create_connection("C:\\Users\\79112\\Desktop\\Rep\\MA_sorev_bot\\database.sqlite")
 answer = ''
@@ -26,7 +25,7 @@ with open('input.txt', 'w', encoding = 'UTF-8') as f:
 
 @bot.message_handler(commands=["start"]) 
 def start(m, res=False):
-    if m.from_user.id == 1835294966:
+    if m.from_user.id == int(open('Admins ID.txt', 'r').read()):
         answer = "Код:"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, admin_code)
