@@ -4,8 +4,11 @@
 
 import telebot
 from telebot import types
+from datetime import date as d
 import DBMS
 import Key 
+
+
 
 
 bot = telebot.TeleBot(open('API.txt', 'r').read())
@@ -106,9 +109,14 @@ def sex(m):
 
 def born_year(m):
     try:
-        information[m.from_user.id].append(int(m.text.strip()))
+        year_check = int(m.text.strip())
+        if 1900 < year_check <= d.today().year:
+            information[m.from_user.id].append(year_check)
         
-        answer = "Напишите, пожалуйста, Ваш вес\n(60)"
+        else:
+            b = a[0]
+        
+        answer = "Напишите, пожалуйста, Ваш вес в кг\n(60)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, weight)
     
@@ -120,7 +128,12 @@ def born_year(m):
 
 def weight(m):
     try:
-        information[m.from_user.id].append(int(float(m.text.strip())))
+        weight_check = int(float(m.text.strip()))
+        if 0 < weight_check < 777:
+            information[m.from_user.id].append(weight_check)
+
+        else:
+            b = a[0]
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
         item1=types.KeyboardButton("Новичок")
@@ -180,6 +193,8 @@ def check(m):
 
 
         else:
+            information[m.from_user.id] = []
+
             answer = "Вы успешно зарегестрировались"
             bot.send_message(m.chat.id, answer)
     
@@ -243,8 +258,10 @@ def criter(m):
         bot.register_next_step_handler(m, new_value)
 
     else:
-        lst = ["Фамилия", "Имя", "Отчество", "Год рождения", "Вес"]
+        lst = ["Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес"]
         for i in range(len(lst)):
+            if i == 3: continue
+
             if m.text.strip() == lst[i]:
                 new_value_ind = i
                 answer = "Напишите новое значение"
