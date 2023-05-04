@@ -4,6 +4,8 @@
 
 import telebot
 from telebot import types
+from random import choice as c, randint as r
+
 from datetime import date as d
 import DBMS
 import Key 
@@ -180,6 +182,10 @@ def check(m):
     if m.text.strip() == 'Всё корректно':
         info = (m.from_user.id, ) +  tuple(information[m.from_user.id])
         DBMS.add_information_in_competitors(connection, info)
+
+        for i in range(3):
+            info = (r(1, 10e7), c(DBMS.names), c(DBMS.surnames), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.status))
+            DBMS.add_information_in_competitors(connection, info)
         #print(DBMS.error)
 
         if DBMS.error == True:

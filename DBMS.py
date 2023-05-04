@@ -75,3 +75,12 @@ def add_information_in_competitors(connection, info):
     """
     
     execute_query_values(connection, add_information_in_competitors_query, info)
+
+
+names = ["Валера", "Гоша", "Серёжа", "Виктор", "Олежа"]
+surnames = ["Хуеглотов", "Лазарев", "Белобородов", "Пидоро", "Ващенко"]
+patronymics = ["Алексеевич", "Михалыч", "Игнатич", "Буратиныч", "Виcсарионович"]
+sex = ["Мужской", "Женский"]
+age = [1939, 1941, 1991, 2014, 1917]
+weight = [1, 776, 300, 69, 11]
+status = ["Новичок", "Опытный", "Эксперт"]
