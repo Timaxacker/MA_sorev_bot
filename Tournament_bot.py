@@ -47,6 +47,8 @@ def admin_code(m):
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
         item1=types.KeyboardButton("Вывести бд в файл")
         markup.add(item1)
+        item2=types.KeyboardButton("Сгенерировать категории")
+        markup.add(item2)
 
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, admin_menu)
@@ -184,7 +186,7 @@ def check(m):
         DBMS.add_information_in_competitors(connection, info)
 
         for i in range(3):
-            info = (r(1, 10e7), c(DBMS.names), c(DBMS.surnames), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.status))
+            info = (r(1, 10e7), c(DBMS.surnames), c(DBMS.names), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.status))
             DBMS.add_information_in_competitors(connection, info)
         #print(DBMS.error)
 
@@ -342,6 +344,9 @@ def new_value(m):
 
 def admin_menu(m):
     if m.text.strip() == 'Вывести бд в файл':
+        with open('input.txt', 'w', encoding = 'UTF-8') as f:
+            print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
+        
         competitors = DBMS.execute_read_query(connection, DBMS.select_competitors)
         
         try:
@@ -355,6 +360,26 @@ def admin_menu(m):
 
         except: print("Error")
 
+    elif  m.text.strip() == 'Сгенерировать категории':
+        cat = {}
+        
+        competitors = DBMS.execute_read_query(connection, DBMS.select_competitors_in_categories)
+
+        for competitor in competitors:
+            crit = [0 ,'Мужской', 1991, 300, 'Эксперт']
+            
+            for i in range(1, 5):
+                print(competitor[i], crit[i])
+
+                if competitor[i] != crit[i]:
+                    break
+            
+            else:
+                cat[competitor[0]] = []
+
+        print(cat)
+
+        
     else:
         answer = "Нажимай на кнопки!"
         bot.send_message(m.chat.id, answer)

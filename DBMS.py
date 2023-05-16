@@ -60,9 +60,23 @@ CREATE TABLE IF NOT EXISTS competitors (
 );
 """
 
-delete_comment = "DELETE FROM competitors WHERE id > 0"
+
+delete_comment = "DELETE FROM competitors WHERE id >= 0"
+
 
 select_competitors = "SELECT * from competitors"
+
+
+select_competitors_in_categories = """
+SELECT
+    competitors.id,
+    competitors.sex,
+    competitors.age,
+    competitors.weight,
+    competitors.status
+FROM
+    competitors
+"""
 
 
 
@@ -77,8 +91,11 @@ def add_information_in_competitors(connection, info):
     execute_query_values(connection, add_information_in_competitors_query, info)
 
 
-names = ["Валера", "Гоша", "Серёжа", "Виктор", "Олежа"]
+
+    
+
 surnames = ["Хуеглотов", "Лазарев", "Белобородов", "Пидоро", "Ващенко"]
+names = ["Валера", "Гоша", "Серёжа", "Виктор", "Олежа"]
 patronymics = ["Алексеевич", "Михалыч", "Игнатич", "Буратиныч", "Виcсарионович"]
 sex = ["Мужской", "Женский"]
 age = [1939, 1941, 1991, 2014, 1917]
