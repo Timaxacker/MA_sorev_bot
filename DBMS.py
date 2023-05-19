@@ -61,6 +61,36 @@ CREATE TABLE IF NOT EXISTS competitors (
 """
 
 
+create_ages_table = """
+CREATE TABLE IF NOT EXISTS ages (
+  id INTEGER PRIMARY KEY,
+  interval TEXT
+);
+"""
+
+create_ages_intervals = """
+INSERT INTO
+  ages (id, interval)
+VALUES
+  (0, '4-5');
+"""
+
+
+create_statuses_table = """
+CREATE TABLE IF NOT EXISTS statuses (
+  id INTEGER PRIMARY KEY,
+  interval TEXT
+);
+"""
+
+create_statuses_intervals = """
+INSERT INTO
+  statuses (id, interval)
+VALUES
+  (0, 'Новичок');
+"""
+
+
 delete_comment = "DELETE FROM competitors WHERE id >= 0"
 
 

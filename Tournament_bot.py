@@ -22,6 +22,9 @@ competitors_db = {}
 
 DBMS.execute_query(connection, DBMS.delete_comment)
 
+DBMS.execute_query(connection, DBMS.create_statuses_table)
+DBMS.execute_query(connection, DBMS.create_statuses_intervals)
+
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
 
