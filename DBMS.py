@@ -72,7 +72,25 @@ create_ages_intervals = """
 INSERT INTO
   ages (id, interval)
 VALUES
-  (0, '4-5');
+  (0, '4'),
+  (1, '5'),
+  (2, '6'),
+  (3, '7'),
+  (4, '8'),
+  (5, '9'),
+  (6, '10'),
+  (7, '11'),
+  (8, '12'),
+  (9, '13'),
+  (10, '14'),
+  (11, '15'),
+  (12, '16'),
+  (13, '17'),
+  (14, '18'),
+  (15, '19-49'),
+  (16, '50-56'),
+  (17, '57-66'),
+  (18, '67+');
 """
 
 
@@ -87,11 +105,30 @@ create_statuses_intervals = """
 INSERT INTO
   statuses (id, interval)
 VALUES
-  (0, 'Новичок');
+  (0, 'white'),
+  (1, 'grey/white'),
+  (2, 'grey'),
+  (3, 'grey/black'),
+  (4, 'yellow/white'),
+  (5, 'yellow'),
+  (6, 'yellow/black'),
+  (7, 'orange/white'),
+  (8, 'orange'),
+  (9, 'orange/black'),
+  (10, 'green/white'),
+  (11, 'green'),
+  (12, 'green/black'),
+  (13, 'blue'),
+  (14, 'purple'),
+  (15, 'brown'),
+  (16, 'black'),
+  (17, 'red/black'),
+  (18, 'red/white'),
+  (19, 'red')
 """
 
 
-delete_comment = "DELETE FROM competitors WHERE id >= 0"
+delete = "DELETE FROM competitors WHERE id >= 0"
 
 
 select_competitors = "SELECT * from competitors"
@@ -99,13 +136,21 @@ select_competitors = "SELECT * from competitors"
 
 select_competitors_in_categories = """
 SELECT
-    competitors.id,
-    competitors.sex,
-    competitors.age,
-    competitors.weight,
-    competitors.status
+    id,
+    sex,
+    age,
+    weight,
+    status
 FROM
     competitors
+"""
+
+
+select_ages_intervals = """
+SELECT
+    interval
+FROM
+    ages
 """
 
 
@@ -122,7 +167,7 @@ def add_information_in_competitors(connection, info):
 
 
 
-    
+
 
 surnames = ["Хуеглотов", "Лазарев", "Белобородов", "Пидоро", "Ващенко"]
 names = ["Валера", "Гоша", "Серёжа", "Виктор", "Олежа"]

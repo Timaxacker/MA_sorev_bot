@@ -20,10 +20,10 @@ date = Key.date()
 information = {}
 competitors_db = {}
 
-DBMS.execute_query(connection, DBMS.delete_comment)
+DBMS.execute_query(connection, DBMS.delete)
 
-DBMS.execute_query(connection, DBMS.create_statuses_table)
-DBMS.execute_query(connection, DBMS.create_statuses_intervals)
+#DBMS.execute_query(connection, DBMS.delete)
+#DBMS.execute_query(connection, DBMS.create_statuses_intervals)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
@@ -382,6 +382,10 @@ def admin_menu(m):
 
         print(cat)
 
+        intervals = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
+
+        for interval in intervals:
+            print(interval, type(interval))
         
     else:
         answer = "Нажимай на кнопки!"
