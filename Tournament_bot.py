@@ -47,10 +47,9 @@ def admin_code(m):
         answer = "Вы перешли в режим БОГАААААА!!!"
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1=types.KeyboardButton("Вывести бд в файл")
-        markup.add(item1)
-        item2=types.KeyboardButton("Сгенерировать категории")
-        markup.add(item2)
+        lst_of_but = ["Вывести бд в файл", "Сгенерировать категории"]
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(i))
 
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, admin_menu)
@@ -90,10 +89,10 @@ def fio(m):
     
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1=types.KeyboardButton("Мужской")
-        markup.add(item1)
-        item2=types.KeyboardButton("Женский")
-        markup.add(item2)
+        lst_of_but = ["Мужской", "Женский"]
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(i))
+
 
         answer = "Выберите, пожалуйста, Ваш пол"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -141,12 +140,9 @@ def weight(m):
             b = a[0]
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1=types.KeyboardButton("Новичок")
-        markup.add(item1)
-        item2=types.KeyboardButton("Опытный")
-        markup.add(item2)
-        item3=types.KeyboardButton("Эксперт")
-        markup.add(item3)
+        lst_of_but = ["Новичок", "Опытный", "Эксперт"]
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(i))
 
         answer = "Выберите, пожалуйста, Вашу категорию"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -165,10 +161,10 @@ def status(m):
         competitors_db[m.from_user.id] = date.encrypt(information[m.from_user.id])
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1=types.KeyboardButton("Всё корректно")
-        markup.add(item1)
-        item2=types.KeyboardButton("Не всё корректно")
-        markup.add(item2)
+        lst_of_but = ["Всё корректно", "Не всё корректно"]
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(i))
+
 
         answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nКатегория: {information[m.from_user.id][6]}"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -190,7 +186,6 @@ def check(m):
         for i in range(3):
             info = (r(1, 10e7), c(DBMS.surnames), c(DBMS.names), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.status))
             DBMS.add_information_in_competitors(connection, info)
-        #print(DBMS.error)
 
         if DBMS.error == True:
             answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
@@ -210,20 +205,9 @@ def check(m):
 
     elif m.text.strip() == 'Не всё корректно':
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        item1=types.KeyboardButton("Фамилия")
-        markup.add(item1)
-        item2=types.KeyboardButton("Имя")
-        markup.add(item2)
-        item3=types.KeyboardButton("Отчество")
-        markup.add(item3)
-        item4=types.KeyboardButton("Пол")
-        markup.add(item4)
-        item5=types.KeyboardButton("Год рождения")
-        markup.add(item5)
-        item6=types.KeyboardButton("Вес")
-        markup.add(item6)
-        item7=types.KeyboardButton("Категория")
-        markup.add(item7)
+        lst_of_but = ["Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"]
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(i))
 
         answer = "Что именно некорректно?"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -246,21 +230,17 @@ def criter(m):
             new_value_ind = 3
         
             markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-            item1=types.KeyboardButton("Мужской")
-            markup.add(item1)
-            item2=types.KeyboardButton("Женский")
-            markup.add(item2)
+            lst_of_but = ["Мужской", "Женский"]
+            for i in lst_of_but:
+                markup.add(types.KeyboardButton(i))
         
         elif m.text.strip() == 'Категория':
             new_value_ind = 6
         
             markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-            item1=types.KeyboardButton("Новичок")
-            markup.add(item1)
-            item2=types.KeyboardButton("Опытный")
-            markup.add(item2)
-            item3=types.KeyboardButton("Эксперт")
-            markup.add(item3)
+            lst_of_but = ["Новичок", "Опытный", "Эксперт"]
+            for i in lst_of_but:
+                markup.add(types.KeyboardButton(i))
 
         answer = "Выберите новое значение"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -333,10 +313,9 @@ def new_value(m):
 
 
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-    item1=types.KeyboardButton("Всё корректно")
-    markup.add(item1)
-    item2=types.KeyboardButton("Не всё корректно")
-    markup.add(item2)
+    lst_of_but = ["Всё корректно", "Не всё корректно"]
+    for i in lst_of_but:
+        markup.add(types.KeyboardButton(i))
 
     answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nКатегория: {information[m.from_user.id][6]}"
     bot.send_message(m.chat.id, answer, reply_markup=markup)
