@@ -22,7 +22,6 @@ competitors_db = {}
 
 DBMS.execute_query(connection, DBMS.delete)
 
-#DBMS.execute_query(connection, DBMS.delete)
 #DBMS.execute_query(connection, DBMS.create_statuses_intervals)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
@@ -79,7 +78,7 @@ def fio(m):
     del(p, mess)
 
     if len(mas) != 3:
-        answer = "ФИО введен некорректно! Попытайтесь еще раз. Вводите ФИО в три слова через пробел.\n(Пример: Иванов Иван Иванович)" 
+        answer = "ФИО введен некорректно! Попытайтесь ещё раз. Вводите ФИО в три слова через пробел.\n(Пример: Иванов Иван Иванович)" 
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
 
@@ -127,7 +126,7 @@ def born_year(m):
         bot.register_next_step_handler(m, weight)
     
     except:
-        answer = "Год рождения введен некорректно! Попытайтесь еще раз.\n(Пример: 2007)"
+        answer = "Год рождения введен некорректно! Попытайтесь ещё раз.\n(Пример: 2007)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, born_year)
 
@@ -154,7 +153,7 @@ def weight(m):
         bot.register_next_step_handler(m, status)
     
     except:
-        answer = "Вес введен некорректно! Попытайтесь еще раз.\n(Пример: 60)"
+        answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, weight)
 
@@ -294,7 +293,7 @@ def new_value(m):
             information[m.from_user.id][new_value_ind] = int(m.text.strip())
         
         except:
-            answer = "Год рождения введен некорректно! Попытайтесь еще раз.\n(Пример: 2007)"
+            answer = "Год рождения введен некорректно! Попытайтесь ещё раз.\n(Пример: 2007)"
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, new_value)
 
@@ -303,7 +302,7 @@ def new_value(m):
             information[m.from_user.id][new_value_ind] = int(float(m.text.strip()))
         
         except:
-            answer = "Вес введен некорректно! Попытайтесь еще раз.\n(Пример: 60)"
+            answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60)"
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, new_value)
 
