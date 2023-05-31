@@ -98,38 +98,48 @@ def fio(m):
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, sex)
 
+
 def sex(m):
     if m.text.strip() in ["Мужской", "Женский"]:
         information[m.from_user.id].append(m.text.strip())
 
-        answer = "Напишите, пожалуйста, Ваш год рождения\n(2007)"
-        bot.send_message(m.chat.id, answer)
+        intervals = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
+
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        lst_of_but = intervals
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(str(*i)))
+
+        answer = "Выберите, пожалуйста, Ваш год рождения"
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, born_year)
+
 
     else:
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, sex)
 
+
 def born_year(m):
-    try:
-        year_check = int(m.text.strip())
-        if 1900 < year_check <= d.today().year:
-            information[m.from_user.id].append(year_check)
-        
-        else:
-            b = a[0]
-        
-        answer = "Напишите, пожалуйста, Ваш вес в кг\n(60)"
-        bot.send_message(m.chat.id, answer)
-        bot.register_next_step_handler(m, weight)
+    intervals = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
     
-    except:
+    for i in intervals:
+        if m.text.strip() == str(*i):
+            information[m.from_user.id].append(m.text.strip())
+            break
+    
+    else:
         answer = "Год рождения введен некорректно! Попытайтесь ещё раз.\n(Пример: 2007)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, born_year)
+    
 
-
+    answer = "Напишите, пожалуйста, Ваш вес в кг\n(60)"
+    bot.send_message(m.chat.id, answer)
+    bot.register_next_step_handler(m, weight)
+    
+    
 def weight(m):
     try:
         weight_check = int(float(m.text.strip()))
@@ -177,7 +187,6 @@ def status(m):
         bot.register_next_step_handler(m, status)
         
   
-     
 def check(m):
     if m.text.strip() == 'Всё корректно':
         info = (m.from_user.id, ) +  tuple(information[m.from_user.id])
@@ -360,10 +369,7 @@ def admin_menu(m):
 
         print(cat)
 
-        intervals = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
-
-        for interval in intervals:
-            print(interval, type(interval))
+        
         
     else:
         answer = "Нажимай на кнопки!"
