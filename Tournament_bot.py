@@ -22,7 +22,7 @@ competitors_db = {}
 
 DBMS.execute_query(connection, DBMS.delete)
 
-#DBMS.execute_query(connection, DBMS.create_statuses_intervals)
+#DBMS.execute_query(connection, DBMS.create_ages_table)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
@@ -103,17 +103,13 @@ def sex(m):
     if m.text.strip() in ["Мужской", "Женский"]:
         information[m.from_user.id].append(m.text.strip())
 
-        intervals = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
-
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        lst_of_but = intervals
-        for i in lst_of_but:
-            markup.add(types.KeyboardButton(str(*i)))
+        for i in range(d.today().year-4, d.today().year-105, -1):
+            markup.add(types.KeyboardButton(str(i)))
 
         answer = "Выберите, пожалуйста, Ваш год рождения"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, born_year)
-
 
     else:
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
@@ -122,15 +118,13 @@ def sex(m):
 
 
 def born_year(m):
-    intervals = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
-    
-    for i in intervals:
-        if m.text.strip() == str(*i):
+    for i in range(d.today().year-4, d.today().year-105, -1):
+        if m.text.strip() == str(i):
             information[m.from_user.id].append(m.text.strip())
             break
     
     else:
-        answer = "Год рождения введен некорректно! Попытайтесь ещё раз.\n(Пример: 2007)"
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, born_year)
     
