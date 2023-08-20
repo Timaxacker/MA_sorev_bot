@@ -22,7 +22,7 @@ competitors_db = {}
 
 DBMS.execute_query(connection, DBMS.delete)
 
-#DBMS.execute_query(connection, DBMS.create_ages_table)
+#DBMS.execute_query(connection, DBMS.create_statuses)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
@@ -56,7 +56,7 @@ def admin_code(m):
         
     else:
         information[m.from_user.id] = []
-        answer = "Пароль неверный(\nФИО"
+        answer = "Пароль неверный(\nФИО)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
 
@@ -143,12 +143,21 @@ def weight(m):
         else:
             b = a[0]
 
+
+        ages = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
+        lst_of_but = []
+
+        for i in ages:
+            if i[0] <= d.today().year - int(information[m.from_user.id][4]) <= i[1]:
+                lst_of_but.append(i[2])
+
+        information[m.from_user.id].append(lst_of_but)
+
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        lst_of_but = ["Новичок", "Опытный", "Эксперт"]
         for i in lst_of_but:
             markup.add(types.KeyboardButton(i))
 
-        answer = "Выберите, пожалуйста, Вашу категорию"
+        answer = "Выберите, пожалуйста, Ваш пояс"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, status)
     
@@ -159,10 +168,10 @@ def weight(m):
 
     
 def status(m):
-    if m.text.strip() in ["Новичок", "Опытный", "Эксперт"]:
-        information[m.from_user.id].append(m.text.strip())
+    if m.text.strip() in information[m.from_user.id][6]:
+        information[m.from_user.id].pop(6)
 
-        competitors_db[m.from_user.id] = date.encrypt(information[m.from_user.id])
+        information[m.from_user.id].append(m.text.strip())
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
         lst_of_but = ["Всё корректно", "Не всё корректно"]
@@ -170,7 +179,7 @@ def status(m):
             markup.add(types.KeyboardButton(i))
 
 
-        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nКатегория: {information[m.from_user.id][6]}"
+        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][6]}"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, check)
         
@@ -208,7 +217,7 @@ def check(m):
 
     elif m.text.strip() == 'Не всё корректно':
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        lst_of_but = ["Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"]
+        lst_of_but = ["Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Пояс"]
         for i in lst_of_but:
             markup.add(types.KeyboardButton(i))
 
@@ -227,8 +236,15 @@ def criter(m):
     global new_value_ind
     new_value_ind = None
 
-    if m.text.strip() in ["Пол", "Категория"]:
-        if m.text.strip() == 'Пол':
+    if m.text.strip() in ["Пол", "Год рождения", "Пояс"]:
+        if m.text.strip() == 'Год рождения':
+            new_value_ind = 4
+
+            markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+            for i in range(d.today().year-4, d.today().year-105, -1):
+                markup.add(types.KeyboardButton(str(i)))
+        
+        elif m.text.strip() == 'Пол':
         
             new_value_ind = 3
         
@@ -237,11 +253,17 @@ def criter(m):
             for i in lst_of_but:
                 markup.add(types.KeyboardButton(i))
         
-        elif m.text.strip() == 'Категория':
+        elif m.text.strip() == 'Пояс':
             new_value_ind = 6
         
+            ages = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
+            lst_of_but = []
+
+            for i in ages:
+                if i[0] <= d.today().year - int(information[m.from_user.id][4]) <= i[1]:
+                    lst_of_but.append(i[2])
+
             markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-            lst_of_but = ["Новичок", "Опытный", "Эксперт"]
             for i in lst_of_but:
                 markup.add(types.KeyboardButton(i))
 
@@ -252,7 +274,7 @@ def criter(m):
     else:
         lst = ["Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес"]
         for i in range(len(lst)):
-            if i == 3: continue
+            if i in [3, 4]: continue
 
             if m.text.strip() == lst[i]:
                 new_value_ind = i
@@ -268,44 +290,81 @@ def criter(m):
         
 
 def new_value(m):
+    val_pass = None
+    
     if new_value_ind in [0, 1, 2]:
         information[m.from_user.id][new_value_ind] = m.text.strip()
 
-    elif new_value_ind == 4:
-        try:
-            information[m.from_user.id][new_value_ind] = int(m.text.strip())
-        
-        except:
-            answer = "Год рождения введен некорректно! Попытайтесь ещё раз.\n(Пример: 2007)"
-            bot.send_message(m.chat.id, answer)
-            bot.register_next_step_handler(m, new_value)
+        val_pass = True
+
 
     elif new_value_ind == 5:
         try:
-            information[m.from_user.id][new_value_ind] = int(float(m.text.strip()))
-        
+            weight_check = int(float(m.text.strip()))
+            if 0 < weight_check < 777:
+                information[m.from_user.id][new_value_ind] = weight_check
+                
+                val_pass = True
+
+            else:
+                b = a[0]
+
+
         except:
             answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60)"
             bot.send_message(m.chat.id, answer)
-            bot.register_next_step_handler(m, new_value)
+
+            val_pass = False
+
 
     elif new_value_ind == 3:
         if m.text.strip() in ["Мужской", "Женский"]:
             information[m.from_user.id][new_value_ind] = m.text.strip()
+
+            val_pass = True
         
         else:
             answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
             bot.send_message(m.chat.id, answer)
-            bot.register_next_step_handler(m, new_value)
 
-    elif new_value_ind == 6:
-        if m.text.strip() in ["Новичок", "Опытный", "Эксперт"]:
-            information[m.from_user.id][new_value_ind] = m.text.strip()
+            val_pass = False
+
+
+    elif new_value_ind == 4:
+        
+        for i in range(d.today().year-4, d.today().year-105, -1):
+            if m.text.strip() == str(i):
+                information[m.from_user.id][new_value_ind] = int(m.text.strip())
+                
+                val_pass = True
+                break
 
         else:
             answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
             bot.send_message(m.chat.id, answer)
-            bot.register_next_step_handler(m, new_value)
+
+            val_pass = False
+
+
+    elif new_value_ind == 6:
+        ages = DBMS.execute_read_query(connection, DBMS.select_ages_intervals)
+        check_lst = []
+
+        for i in ages:
+            if i[0] <= d.today().year - int(information[m.from_user.id][4]) <= i[1]:
+                check_lst.append(i[2])
+
+
+        if m.text.strip() in check_lst:
+            information[m.from_user.id][new_value_ind] = m.text.strip()
+
+            val_pass = True
+
+        else:
+            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer)
+            
+            val_pass = False
 
     else:
         answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
@@ -315,21 +374,25 @@ def new_value(m):
         bot.send_message(m.chat.id, answer)
 
 
-    markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-    lst_of_but = ["Всё корректно", "Не всё корректно"]
-    for i in lst_of_but:
-        markup.add(types.KeyboardButton(i))
+    if val_pass:
+        markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+        lst_of_but = ["Всё корректно", "Не всё корректно"]
+        for i in lst_of_but:
+            markup.add(types.KeyboardButton(i))
 
-    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nКатегория: {information[m.from_user.id][6]}"
-    bot.send_message(m.chat.id, answer, reply_markup=markup)
-    bot.register_next_step_handler(m, check)
+        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][6]}"
+        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        bot.register_next_step_handler(m, check)
 
+    else:
+        bot.register_next_step_handler(m, new_value)
 
+    
 
 def admin_menu(m):
     if m.text.strip() == 'Вывести бд в файл':
         with open('input.txt', 'w', encoding = 'UTF-8') as f:
-            print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
+            print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Пояс"), file = f)
         
         competitors = DBMS.execute_read_query(connection, DBMS.select_competitors)
         
@@ -372,14 +435,4 @@ def admin_menu(m):
 
         
 
-bot.polling(none_stop=True, interval=0) 
-
-
-
-"""
-date = Key.date()
-a = date.encrypt(["тима", "лазарев", 40, 12])
-print(a)
-b = date.decrypt(a)
-print(b)
-"""
+bot.polling(none_stop=True, interval=0)
