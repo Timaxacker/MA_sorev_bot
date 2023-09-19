@@ -22,7 +22,7 @@ competitors_db = {}
 
 DBMS.execute_query(connection, DBMS.delete)
 
-#DBMS.execute_query(connection, DBMS.create_statuses)
+#DBMS.execute_query(connection, DBMS.create_competitors_table)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
@@ -166,7 +166,7 @@ def weight(m):
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, weight)
 
-    
+
 def status(m):
     if m.text.strip() in information[m.from_user.id][6]:
         information[m.from_user.id].pop(6)
@@ -174,14 +174,14 @@ def status(m):
         information[m.from_user.id].append(m.text.strip())
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        lst_of_but = ["Всё корректно", "Не всё корректно"]
+        lst_of_but = ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium", "Другая команда"]
         for i in lst_of_but:
             markup.add(types.KeyboardButton(i))
 
 
-        answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][6]}"
+        answer = "Выберите, пожалуйста, Вашу команду"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
-        bot.register_next_step_handler(m, check)
+        bot.register_next_step_handler(m, team)
         
 
     else:
@@ -189,14 +189,54 @@ def status(m):
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, status)
         
-  
+def team(m):
+    if m.text.strip() in ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]:
+        information[m.from_user.id].append(m.text.strip())
+
+        answer = "Напишите, пожалуйста, фамилию и имя Вашего тренера"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, trainer)
+
+    elif m.text.strip() == "Другая команда":
+        answer = "Напишите, пожалуйста, название Вашей команды"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, other_team)
+
+    else:
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, team)
+
+    
+def other_team(m):
+    information[m.from_user.id].append(m.text.strip())
+    
+    answer = "Напишите, пожалуйста, фамилию и имя Вашего тренера"
+    bot.send_message(m.chat.id, answer)
+    bot.register_next_step_handler(m, trainer)
+
+
+
+def trainer(m):
+    information[m.from_user.id].append(m.text.strip())
+
+    markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+    lst_of_but = ["Всё корректно", "Не всё корректно"]
+    for i in lst_of_but:
+        markup.add(types.KeyboardButton(i))
+
+    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][6]}\nКоманда: {information[m.from_user.id][7]}\nТренер: {information[m.from_user.id][8]}"
+    bot.send_message(m.chat.id, answer, reply_markup=markup)
+    bot.register_next_step_handler(m, check)
+
+
 def check(m):
     if m.text.strip() == 'Всё корректно':
         info = (m.from_user.id, ) +  tuple(information[m.from_user.id])
         DBMS.add_information_in_competitors(connection, info)
 
         for i in range(3):
-            info = (r(1, 10e7), c(DBMS.surnames), c(DBMS.names), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.status))
+            info = (r(1, 10e7), c(DBMS.surnames), c(DBMS.names), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.status), c(DBMS.teams), c(DBMS.trainers))
             DBMS.add_information_in_competitors(connection, info)
 
         if DBMS.error == True:

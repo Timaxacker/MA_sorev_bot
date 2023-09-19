@@ -56,7 +56,9 @@ CREATE TABLE IF NOT EXISTS competitors (
   sex TEXT,
   age INTEGER,
   weight INTEGER,
-  status TEXT
+  status TEXT,
+  team TEXT,
+  trainer
 );
 """
 
@@ -161,9 +163,9 @@ FROM
 def add_information_in_competitors(connection, info):
     add_information_in_competitors_query = """
     INSERT INTO
-        competitors (id, surname, name, patronymic, sex, age, weight, status)
+        competitors (id, surname, name, patronymic, sex, age, weight, status, team, trainer)
     VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?);
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     """
     
     execute_query_values(connection, add_information_in_competitors_query, info)
@@ -179,3 +181,5 @@ sex = ["Мужской", "Женский"]
 age = [1939, 1941, 1991, 2014, 1917]
 weight = [1, 776, 300, 69, 11]
 status = ["Новичок", "Опытный", "Эксперт"]
+teams = ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]
+trainers = ["Иван Михайлович", "Иван Дмитриевич", "Дмитрий Витальевич"]
