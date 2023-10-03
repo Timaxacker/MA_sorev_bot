@@ -22,14 +22,14 @@ competitors_db = {}
 
 DBMS.execute_query(connection, DBMS.delete)
 
-#DBMS.execute_query(connection, DBMS.create_competitors_table)
+#DBMS.execute_query(connection, DBMS.create_weights)
 
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
 
 @bot.message_handler(commands=["start"]) 
 def start(m, res=False):
-    if m.from_user.id == int(open('Admins ID.txt', 'r').read()):
+    if m.from_user.id in eval(open('Admins ID.txt', 'r').read()):
         answer = "Код:"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, admin_code)
@@ -135,10 +135,50 @@ def born_year(m):
     
     
 def weight(m):
+    ex = False
+    
     try:
         weight_check = int(float(m.text.strip()))
         if 0 < weight_check < 777:
             information[m.from_user.id].append(weight_check)
+
+
+            weights_ages = DBMS.execute_read_query(connection, DBMS.select_weights_intervals_age)
+            
+            for i in weights_ages:
+                if d.today().year - int(information[m.from_user.id][4]) in [int(i[1].split('-')[0]), int(i[1].split('-')[1])]:
+                    DBMS.id_weights = i[0]
+
+
+            DBMS.weights = DBMS.execute_read_query(connection, DBMS.select_weights_id + str(DBMS.id_weights))
+            print(DBMS.weights)
+            print(information[m.from_user.id][4])
+
+            if d.today().year - int(information[m.from_user.id][4]) <= 11:
+                print("f")
+                for i in DBMS.weights[0]:
+                    print(i)
+                    if weight_check <= float(i):
+                        print(i, "c")
+                        information[m.from_user.id].append(i)
+                        ex = True
+                        break
+                    
+
+            elif d.today().year - int(information[m.from_user.id][4]) <= 50:
+                print("f")
+                for i in DBMS.weights[0]:
+                    print(i)
+                    if weight_check <= float(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")]):
+                        print(i, "c")
+                        information[m.from_user.id].append(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")])
+                        ex = True
+                        break
+
+
+                    
+                            
+                        
 
         else:
             b = a[0]
@@ -168,8 +208,9 @@ def weight(m):
 
 
 def status(m):
-    if m.text.strip() in information[m.from_user.id][6]:
-        information[m.from_user.id].pop(6)
+    print(information[m.from_user.id])
+    if m.text.strip() in information[m.from_user.id][7]:
+        information[m.from_user.id].pop(7)
 
         information[m.from_user.id].append(m.text.strip())
 
@@ -225,7 +266,7 @@ def trainer(m):
     for i in lst_of_but:
         markup.add(types.KeyboardButton(i))
 
-    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][6]}\nКоманда: {information[m.from_user.id][7]}\nТренер: {information[m.from_user.id][8]}"
+    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][6]}\nПояс: {information[m.from_user.id][7]}\nКоманда: {information[m.from_user.id][8]}\nТренер: {information[m.from_user.id][9]}"
     bot.send_message(m.chat.id, answer, reply_markup=markup)
     bot.register_next_step_handler(m, check)
 

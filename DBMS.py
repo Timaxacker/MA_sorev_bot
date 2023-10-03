@@ -1,7 +1,7 @@
 import sqlite3
 from sqlite3 import Error
 
-
+id_weights = None
 
 def create_connection(path):
     connection = None
@@ -131,6 +131,44 @@ VALUES
 """
 
 
+create_weights_table = """
+CREATE TABLE IF NOT EXISTS weights (
+  id INTEGER PRIMARY KEY,
+  age TEXT,
+  weight0 TEXT,
+  weight1 TEXT,
+  weight2 TEXT,
+  weight3 TEXT,
+  weight4 TEXT,
+  weight5 TEXT,
+  weight6 TEXT,
+  weight7 TEXT,
+  weight8 TEXT,
+  weight9 TEXT,
+  weight10 TEXT
+);
+"""
+
+create_weights = """
+INSERT INTO
+  weights (id, age, weight0, weight1, weight2, weight3, weight4, weight5, weight6, weight7, weight8, weight9, weight10)
+VALUES
+  (0, '4-5', '16', '18', '20', '22', '25', '27.5', '30', '33', '36', '39', '42'),
+  (1, '6-7', '18', '20', '22.5', '25', '27.5', '30', '33', '36', '39', '42', '46'),
+  (2, '8-9', '20', '22.5', '25', '27.5', '30', '33', '36', '40', '44', '49', ''),
+  (3, '10-11', '24', '27', '30', '34', '38', '42', '46', '50', '55', '60', ''),
+  (4, '12-13', '30/32', '33/35', '36/38', '40/41', '45/45', '50/49', '55/53', '60/58', '65/63', '70/68', '/73'),
+  (5, '14-15', '38/36', '42/39', '46/42', '50/46', '55/50', '60/54', '65/58', '70/63', '75/68', '80/74', '/80'),
+  (6, '16-17', '45/40', '50/44', '55/48', '60/52', '65/57', '70/62', '76/68', '83/73', '91/73+', '91+/', ''),
+  (7, '18-29', '50/44', '55/48', '65/52', '60/57', '70/62', '76/68', '83/74', '91/80', '98/80+', '98+/', ''),
+  (8, '30-35', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '90/74', '98/80', '110/87', '110+/87+', ''),
+  (9, '36-40', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+'),
+  (10, '36-40', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+'),
+  (11, '46-50', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+')
+"""
+
+
+
 delete = "DELETE FROM competitors WHERE id >= 0"
 
 
@@ -159,7 +197,32 @@ FROM
 """
 
 
+select_weights_intervals_age = """
+SELECT
+    id,
+    age
+FROM
+    weights
+"""
 
+
+select_weights_id = """
+SELECT 
+    weight0,
+    weight1,
+    weight2,
+    weight3,
+    weight4,
+    weight5,
+    weight6,
+    weight7,
+    weight8,
+    weight9,
+    weight10
+FROM
+    weights
+WHERE id ==""" 
+ 
 def add_information_in_competitors(connection, info):
     add_information_in_competitors_query = """
     INSERT INTO
