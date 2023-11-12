@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import pandas as pd
 
 id_weights = None
 
@@ -55,8 +56,8 @@ CREATE TABLE IF NOT EXISTS competitors (
   patronymic TEXT,
   sex TEXT,
   age INTEGER,
-  weight INTEGER,
-  status TEXT,
+  weight FLOAT,
+  belt TEXT,
   team TEXT,
   trainer
 );
@@ -95,18 +96,18 @@ VALUES
 """
 
 
-create_statuses_table = """
-CREATE TABLE IF NOT EXISTS statuses (
+create_belts_table = """
+CREATE TABLE IF NOT EXISTS belts (
   id INTEGER PRIMARY KEY,
-  status TEXT,
+  belt TEXT,
   min_age INTEGER,
   max_age INTEGER
 );
 """
 
-create_statuses = """
+create_belts = """
 INSERT INTO
-  statuses (id, status, min_age, max_age)
+  belts (id, belt, min_age, max_age)
 VALUES
   (0, 'Белый', 4, 104),
   (1, 'Серый-Белый', 4, 15),
@@ -163,7 +164,7 @@ VALUES
   (7, '18-29', '50/44', '55/48', '65/52', '60/57', '70/62', '76/68', '83/74', '91/80', '98/80+', '98+/', ''),
   (8, '30-35', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '90/74', '98/80', '110/87', '110+/87+', ''),
   (9, '36-40', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+'),
-  (10, '36-40', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+'),
+  (10, '41-45', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+'),
   (11, '46-50', '55/44', '60/48', '65/52', '70/57', '76/62', '83/68', '91/74', '98/80', '110/87', '110+/94', '/94+')
 """
 
@@ -191,9 +192,9 @@ select_ages_intervals = """
 SELECT
     min_age,
     max_age,
-    status
+    belt
 FROM
-    statuses
+    belts
 """
 
 
@@ -226,7 +227,7 @@ WHERE id =="""
 def add_information_in_competitors(connection, info):
     add_information_in_competitors_query = """
     INSERT INTO
-        competitors (id, surname, name, patronymic, sex, age, weight, status, team, trainer)
+        competitors (id, surname, name, patronymic, sex, age, weight, belt, team, trainer)
     VALUES
         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     """
@@ -235,6 +236,10 @@ def add_information_in_competitors(connection, info):
 
 
 
+def output(connection):
+    df = pd.read_sql(select_competitors, connection)
+    df.to_excel('output.xlsx', index=False)
+
 
 
 surnames = ["Хуеглотов", "Лазарев", "Белобородов", "Пидоро", "Ващенко"]
@@ -242,7 +247,8 @@ names = ["Валера", "Гоша", "Серёжа", "Виктор", "Олежа
 patronymics = ["Алексеевич", "Михалыч", "Игнатич", "Буратиныч", "Виcсарионович"]
 sex = ["Мужской", "Женский"]
 age = [1939, 1941, 1991, 2014, 1917]
-weight = [1, 776, 300, 69, 11]
-status = ["Новичок", "Опытный", "Эксперт"]
+weight = [1, 110, 77, 69, 11]
+belt = ["Белый", "Серо-белый", "Серый", "Серо-чёрный", "Жёлто-белый", "Жёлтый", "Жёлто-чёрный", "Зелёно-белый", "Зелёный",
+    "Зелёно-чёрный", "Синий", "Фиолетовый", "Коричневый", "Чёрный", "Красно-чёрный", "Красно-белый", "Красный"]
 teams = ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]
 trainers = ["Иван Михайлович", "Иван Дмитриевич", "Дмитрий Витальевич"]
