@@ -238,7 +238,7 @@ def add_information_in_competitors(connection, info):
 
 def output(connection):
     df = pd.read_sql(select_competitors, connection)
-    df.to_excel('output.xlsx', index=False)
+    df.to_excel('competitors.xlsx', index=False)
 
 
 

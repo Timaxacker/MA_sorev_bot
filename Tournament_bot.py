@@ -9,6 +9,8 @@ from datetime import date as d
 import DBMS
 import Key 
 import pandas as pd
+import setka
+import csv
 
 
 bot = telebot.TeleBot(open('API.txt', 'r').read())
@@ -23,30 +25,68 @@ DBMS.execute_query(connection, DBMS.delete)
 
 #DBMS.execute_query(connection, DBMS.create_competitors_table)
 
+"""
 with open('input.txt', 'w', encoding = 'UTF-8') as f:
     print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Категория"), file = f)
+"""
+    
+def beautiful_output(data_cur, tupe):
+    out = ""
+    if tupe == "p":
+        data_cur = data_cur.split(";")
+        for i in data_cur:
+            out += f"{i} "
+    elif tupe in ("a", "w"):
+        # data_cur = data_cur.split("-")
+        if data_cur[1] == "inf":
+            out += f"{data_cur[0]}+"
+        else:
+            out += f"{data_cur[0]}-{data_cur[1]}"
+    return out
 
 @bot.message_handler(commands=["start"]) 
 def start(m, res=False):
+    information[m.from_user.id] = []
+    
+    markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
+    lst_of_but = ["Согласен(а)", "Не согласен(а)"]
+    for i in lst_of_but:
+        markup.add(types.KeyboardButton(i))
+
     if m.from_user.id in eval(open('Admins ID.txt', 'r').read()):
         answer = "Код:"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, admin_code)
 
     else:
-        information[m.from_user.id] = []
-        answer = "Здравствуйте. Напишите, пожалуйста, Ваше ФИО\n(Иванов Иван Иванович)"
-        bot.send_message(m.chat.id, answer)
-        bot.register_next_step_handler(m, fio)
+        answer = 'Здравствуйте. Для продолжения Вам требуется согласиться на <a href="https://10.rkn.gov.ru/docs/10/Pravila_obrabotki_PD.pdf">обработку персональных данных</a>'
+        bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
+        bot.register_next_step_handler(m, pers_data)
 
 
 @bot.message_handler(content_types=["text"]) 
+def pers_data(m):
+    if m.text.strip() == "Согласен(а)":
+        answer = "Напишите, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, fio)
+
+    elif m.text.strip() == "Не согласен(а)":
+        answer = "Для продолжения Вам требуется согласится на обработку персональных данных"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, pers_data)
+
+    else:
+        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, pers_data)
+
 def admin_code(m):
     if m.text.strip() == '777':
         answer = "Вы перешли в режим БОГАААААА!!!"
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-        lst_of_but = ["Вывести бд в файл", "Сгенерировать категории"]
+        lst_of_but = ["Файл с участниками", "Файл с категориями"]
         for i in lst_of_but:
             markup.add(types.KeyboardButton(i))
 
@@ -93,7 +133,7 @@ def fio(m):
             markup.add(types.KeyboardButton(i))
 
 
-        answer = "Выберите, пожалуйста, Ваш пол"
+        answer = "Выберите, пожалуйста, пол участника"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, sex)
 
@@ -106,7 +146,7 @@ def sex(m):
         for i in range(d.today().year-4, d.today().year-105, -1):
             markup.add(types.KeyboardButton(str(i)))
 
-        answer = "Выберите, пожалуйста, Ваш год рождения"
+        answer = "Выберите, пожалуйста, год рождения участника"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, born_year)
 
@@ -121,7 +161,7 @@ def born_year(m):
         if m.text.strip() == str(i):
             information[m.from_user.id].append(m.text.strip())
             
-            answer = "Напишите, пожалуйста, Ваш вес в кг\n(60)"
+            answer = "Напишите, пожалуйста, вес участника в кг\n(60)"
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, weight)
             
@@ -249,7 +289,7 @@ def weight(m):
         for i in lst_of_but:
             markup.add(types.KeyboardButton(i))
 
-        answer = "Выберите, пожалуйста, Ваш пояс"
+        answer = "Выберите, пожалуйста, пояс участника"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, belt)
     
@@ -272,7 +312,7 @@ def belt(m):
             markup.add(types.KeyboardButton(i))
 
 
-        answer = "Выберите, пожалуйста, Вашу команду"
+        answer = "Выберите, пожалуйста, команду участника"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, team)
         
@@ -286,12 +326,12 @@ def team(m):
     if m.text.strip() in ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]:
         information[m.from_user.id].append(m.text.strip())
 
-        answer = "Напишите, пожалуйста, фамилию и имя Вашего тренера"
+        answer = "Напишите, пожалуйста, фамилию и имя тренера участника"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, trainer)
 
     elif m.text.strip() == "Другая команда":
-        answer = "Напишите, пожалуйста, название Вашей команды"
+        answer = "Напишите, пожалуйста, название команды участника"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, other_team)
 
@@ -304,7 +344,7 @@ def team(m):
 def other_team(m):
     information[m.from_user.id].append(m.text.strip())
     
-    answer = "Напишите, пожалуйста, фамилию и имя Вашего тренера"
+    answer = "Напишите, пожалуйста, фамилию и имя тренера участника"
     bot.send_message(m.chat.id, answer)
     bot.register_next_step_handler(m, trainer)
 
@@ -328,7 +368,7 @@ def check(m):
         info = (m.from_user.id, ) +  tuple(information[m.from_user.id][:5]) + tuple(information[m.from_user.id][6:])
         DBMS.add_information_in_competitors(connection, info)
 
-        for i in range(3):
+        for i in range(300):
             info = (r(1, 10e7), c(DBMS.surnames), c(DBMS.names), c(DBMS.patronymics), c(DBMS.sex), c(DBMS.age), c(DBMS.weight), c(DBMS.belt), c(DBMS.teams), c(DBMS.trainers))
             DBMS.add_information_in_competitors(connection, info)
 
@@ -628,7 +668,8 @@ def new_value(m):
     
 
 def admin_menu(m):
-    if m.text.strip() == 'Вывести бд в файл':
+    if m.text.strip() == 'Файл с участниками':
+        """
         with open('input.txt', 'w', encoding = 'UTF-8') as f:
             print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Пояс"), file = f)
         
@@ -643,14 +684,17 @@ def admin_menu(m):
 
             #with open('input.txt', 'rb') as f: bot.send_document(m.chat.id, f)
 
-        except: print("Error")
-
+        except:
+            print("Error")
+    """
 
         DBMS.output(connection)
-        with open('output.xlsx', 'rb') as f: bot.send_document(m.chat.id, f)
+        with open('competitors.xlsx', 'rb') as f:
+            bot.send_document(m.chat.id, f)
 
 
-    elif  m.text.strip() == 'Сгенерировать категории':
+    elif  m.text.strip() == 'Файл с категориями':
+        """
         cat = {}
         
         competitors = DBMS.execute_read_query(connection, DBMS.select_competitors_in_categories)
@@ -668,7 +712,28 @@ def admin_menu(m):
                 cat[competitor[0]] = []
 
         print(cat)
+        """
 
+        data = setka.compute_without_gui("C:\\Users\\79112\\Desktop\\Rep\\MA_sorev_bot\\database.sqlite")
+        # print(data.groups)
+
+
+        with open('categories.csv', 'w') as f:
+            writer = csv.writer(f, delimiter=';')
+            for key, value in data.groups.items():
+                print(value)
+                age = value['age']
+                weight = value['weight']
+                writer.writerow((value['sex'],
+                value['belt'],
+                beautiful_output(setka.ages[age], "a"),  # f"{setka.ages[age][0]}-{setka.ages[age][1]}",
+                beautiful_output(setka.check_weight(setka.weights, setka.ages[age][1], weight, value['sex']), "w")))  # f"{setka.check_weight(setka.weights, setka.ages[age][1], weight, value['sex'])[0]}-{setka.check_weight(setka.weights, setka.ages[age][1], weight, value['sex'])[1]}"
+                for j in value['peoples'].keys():
+                    writer.writerow(('', beautiful_output(j, "p")))
+
+        with open('categories.csv', 'rb') as f:
+            bot.send_document(m.chat.id, f)
+            
         
         
     else:

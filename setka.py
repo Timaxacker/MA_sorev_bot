@@ -158,7 +158,7 @@ class Place:
                             # print(len(self.groups[str(n)]["peoples"]), max_n, name_p, keys(dat3)[-1])
                             if len(self.groups[str(n)]["peoples"]) == max_n and (name_p != keys(dat3)[-1]):
                                 n += 1
-                                self.groups[str(n)] = {"belt": belt, "age": age, "weight": weight, "peoples": {}}
+                                self.groups[str(n)] = {"sex": sex, "belt": belt, "age": age, "weight": weight, "peoples": {}}
                         n += 1
 
 
@@ -276,8 +276,12 @@ def len_(mas):
             return True
 
 
+def compute_without_gui(path):
+    open_db(path)
+    return Place(peoples)
+
+
 def compute():
-#     global data
     global data, entry_belt_main, entry_age_main, entry_weight_main, entry_people_main, label_people_data_main, entry_group_n_main, label_group_date, label_group_peoples, label_choice_age_actyal, label_choice_weight_actyal, entry_group_find, entry_sex_main
     if len(peoples) == 0 or len_(peoples):
         mb.showinfo("Так нельзя", "Введите хотя бы одного человека")
@@ -537,23 +541,27 @@ def add():
     #     mb.showinfo("Возникла ошибка.", f"{e}\n\nПожалуста, собщите об ошибке.")
 
 
-def open_db():
+def open_db_1():
+    open_db(filedialog.askopenfile().name)
+
+
+def open_db(path):
     global peoples
     # print(filedialog.askopenfile().name)
-    data_base = DBMS.create_connection(filedialog.askopenfile().name)
+    data_base = DBMS.create_connection(path)
     # print(DBMS.execute_read_query(data_base, "SELECT * from competitors"))
     data_of_peoples = DBMS.execute_read_query(data_base, "SELECT * from competitors")
-    print(data_of_peoples)
+    # print(data_of_peoples)
     peoples = {}
-    for data in data_of_peoples:
+    for data_ in data_of_peoples:
         q = ""
         while True:
             try:
-                a = peoples[f"{data[1]};{data[2]};{data[3]}{q}"]
+                a = peoples[f"{data_[1]};{data_[2]};{data_[3]}{q}"]
                 q = int_(q) + 1
             except:
-                peoples[f"{data[1]};{data[2]};{data[3]}{q}"] = People(*data[1:9])
-                del(q)
+                peoples[f"{data_[1]};{data_[2]};{data_[3]}{q}"] = People(*data_[1:9])
+                del q
                 break
 
 
@@ -627,66 +635,64 @@ def add_window():
 #         """)
 
 
-# for i in range(150):
-#     nams = rand_name()
-#     q = ""
-#     # q = int_(q) + 1
-#     while True:
-#         try:
-#             a = peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"]
-#             q = int_(q) + 1
-#         except:
-#             peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"] = People(*nams, randint(40, 790) / 10, belts[randint(0, 16)], randint(150, 950) / 10, choice(["male", "female"]), True)
-#             del(q)
-#             break
-
-
-main_frame = tkinter.Frame(windows["main"], relief=RIDGE)
-main_frame.pack(fill=BOTH, expand=1)
-
-combobox_people = ttk.Combobox(main_frame, font=font, width=25)
-combobox_people["values"] = peoples.keys()
-combobox_people.set("")
-combobox_people.grid_configure(row=0, column=0)
-
-label_people_data = tkinter.Label(main_frame, font=font, text=data_of_people())
-label_people_data.grid_configure(row=1)
-
-btn_add = tkinter.Button(main_frame, command=add_window, font=font)
-btn_add["text"] = "Добавить человека"
-btn_add.grid_configure(row=2)
-
-label_group_n = tkinter.Label(main_frame, font=font, text="Макс. чел. в группе")
-label_group_n.grid_configure(row=3, column=1)
-
-label_group_n = tkinter.Label(main_frame, font=font, text=f"Зарегестрированно: {len(peoples)}")
-label_group_n.grid_configure(row=0, column=1)
-
-# dlg = Open(master=main_frame, filetypes=[('Python files', '*.py'), ('All files', '*')])
-# fl = dlg.show()
-# path = filedialog.askopenfilename()
-
-btn_add = tkinter.Button(main_frame, command=open_db, font=font)
-btn_add["text"] = "Открыть базу"
-btn_add.grid_configure(row=3, column=0)
-
-entry_group_n = ttk.Combobox(main_frame, font=font)
-entry_group_n["values"] = ["3", "4", "5", "6", "7"]
-entry_group_n.set("3")
-entry_group_n.grid_configure(row=4, column=1)
-
-btn_add = tkinter.Button(main_frame, command=compute, font=font)
-btn_add["text"] = "Расчитать"
-btn_add.grid_configure(row=4)
-btn_change = tkinter.Button(main_frame, command=change, font=font)
-btn_change["text"] = "Изменить"
-btn_change.grid_configure(row=1, column=1)
-btn_del = tkinter.Button(main_frame, command=delete, font=font)
-btn_del["text"] = "Удалить"
-btn_del.grid_configure(row=2, column=1)
+for i in range(150):
+    nams = rand_name()
+    q = ""
+    # q = int_(q) + 1
+    while True:
+        try:
+            a = peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"]
+            q = int_(q) + 1
+        except:
+            peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"] = People(*nams, choice(["Мужской", "Женский"]), randint(4, 79), randint(150, 950) / 10, belts[randint(0, 16)], True)
+            del(q)
+            break
 
 
 if __name__ == "__main__":
+    main_frame = tkinter.Frame(windows["main"], relief=RIDGE)
+    main_frame.pack(fill=BOTH, expand=1)
+
+    combobox_people = ttk.Combobox(main_frame, font=font, width=25)
+    combobox_people["values"] = peoples.keys()
+    combobox_people.set("")
+    combobox_people.grid_configure(row=0, column=0)
+
+    label_people_data = tkinter.Label(main_frame, font=font, text=data_of_people())
+    label_people_data.grid_configure(row=1)
+
+    btn_add = tkinter.Button(main_frame, command=add_window, font=font)
+    btn_add["text"] = "Добавить человека"
+    btn_add.grid_configure(row=2)
+
+    label_group_n = tkinter.Label(main_frame, font=font, text="Макс. чел. в группе")
+    label_group_n.grid_configure(row=3, column=1)
+
+    label_group_n = tkinter.Label(main_frame, font=font, text=f"Зарегестрированно: {len(peoples)}")
+    label_group_n.grid_configure(row=0, column=1)
+
+    # dlg = Open(master=main_frame, filetypes=[('Python files', '*.py'), ('All files', '*')])
+    # fl = dlg.show()
+    # path = filedialog.askopenfilename()
+
+    btn_add = tkinter.Button(main_frame, command=open_db_1, font=font)
+    btn_add["text"] = "Открыть базу"
+    btn_add.grid_configure(row=3, column=0)
+
+    entry_group_n = ttk.Combobox(main_frame, font=font)
+    entry_group_n["values"] = ["3", "4", "5", "6", "7"]
+    entry_group_n.set("3")
+    entry_group_n.grid_configure(row=4, column=1)
+
+    btn_add = tkinter.Button(main_frame, command=compute, font=font)
+    btn_add["text"] = "Расчитать"
+    btn_add.grid_configure(row=4)
+    btn_change = tkinter.Button(main_frame, command=change, font=font)
+    btn_change["text"] = "Изменить"
+    btn_change.grid_configure(row=1, column=1)
+    btn_del = tkinter.Button(main_frame, command=delete, font=font)
+    btn_del["text"] = "Удалить"
+    btn_del.grid_configure(row=2, column=1)
     while True:
         try:
             # print(data(peoples[keys(peoples)[combobox_people.current()]]))
@@ -718,15 +724,16 @@ if __name__ == "__main__":
             entry_belt_main["values"] = k1
             k2 = keys(data.pos[keys(data.pos)[entry_sex_main.current()]][k1[entry_belt_main.current()]])
             entry_age_main["values"] = k2
-            entry_age_main.set(k2[0])
             k3 = keys(data.pos[keys(data.pos)[entry_sex_main.current()]][k1[entry_belt_main.current()]][k2[entry_age_main.current()]])
             entry_weight_main["values"] = k3
-            entry_weight_main.set(k3[0])
-            label_people_data_main["text"] = data_of_people(data.pos[keys(data.pos)[entry_sex_main.current()]][keys(data.pos)[entry_belt_main.current()]][k2[entry_age_main.current()]][k3[entry_weight_main.current()]][k4[entry_people_main.current()]])
+            k4 = keys(data.pos[keys(data.pos)[entry_sex_main.current()]][k1[entry_belt_main.current()]][k2[entry_age_main.current()]][k3[entry_weight_main.current()]])
+            entry_people_main["values"] = k4
+            data_cur = data.pos[keys(data.pos)[entry_sex_main.current()]][k1[entry_sex_main.current()]][k2[entry_age_main.current()]][k3[entry_weight_main.current()]][k4[entry_people_main.current()]]
+            label_people_data_main["text"] = data_of_people(data_cur)
             age = k2[entry_age_main.current()]
             weight = k3[entry_weight_main.current()]
             label_choice_age_actyal["text"] = f"{ages[age][0]}-{ages[age][1]}"
-            label_choice_weight_actyal["text"] = f"{check_weight(weights, ages[age][1], weight)[0]}-{check_weight(weights, ages[age][1], weight)[1]}"
+            label_choice_weight_actyal["text"] = f"{check_weight(weights, ages[age][1], weight, data_cur.sex)[0]}-{check_weight(weights, ages[age][1], weight, data_cur.sex)[1]}"
         except Exception as e:
             # print(e)
             pass
