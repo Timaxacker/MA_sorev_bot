@@ -4,6 +4,7 @@ from tkinter.constants import *
 from tkinter import filedialog
 from random import randint, choice
 from math import inf
+from datetime import date
 import DBMS
 
 
@@ -14,29 +15,107 @@ belts = [
 windows = {"main": tkinter.Tk(className="Сетка V1-5 beta")}
 font = ("Arial", 12)
 peoples = {}
+
+"""
+,
+    "[, ]-male": {
+        "1": [0, ], "2": [, ], "3": [, ], "4": [, ], "5": [, ], "6": [, ], "7": [, ],
+        "8": [, ], "9": [, ], "10": [, ]
+    },
+    "[, ]-female": {
+        "1": [0, ], "2": [, ], "3": [, ], "4": [, ], "5": [, ], "6": [, ], "7": [, ],
+        "8": [, ], "9": [, ], "10": [, ]
+    }
+"""  # base sructure
+
 weights = {
     "[4, 5]-all": {
-        "1": [0, 16], "2": [16, 18], "3": [18, 20], "4": [20, 22], "5": [22, 25], "6": [25, 27.5],
-        "7": [27.5, 30], "8": [30, 33], "9": [33, 36], "10": [36, 39], "11": [39, 42], "12": [42, inf]
+        "1": [0, 16], "2": [16, 18], "3": [18, 20], "4": [20, 22], "5": [22, 25], "6": [25, 27.5], "7": [27.5, 30],
+        "8": [30, 33], "9": [33, 36], "10": [36, 39], "11": [39, 42], "12": [42, inf]
     },
     "[5, 7]-all": {
-        "1": [0, 18], "2": [18, 20], "3": [20, 22.5], "4": [22.5, 25], "5": [25, 27.5], "6": [27.5, 30],
-        "7": [30, 33], "8": [33, 36], "9": [36, 39], "10": [39, 42], "11": [42, 46], "12": [46, inf]
+        "1": [0, 18], "2": [18, 20], "3": [20, 22.5], "4": [22.5, 25], "5": [25, 27.5], "6": [27.5, 30], "7": [30, 33],
+        "8": [33, 36], "9": [36, 39], "10": [39, 42], "11": [42, 46], "12": [46, inf]
     },
     "[7, 9]-all": {
-        "1": [0, 20], "2": [20, 22.5], "3": [22.5, 25], "4": [25, 27.5], "5": [27.5, 30], "6": [30, 33],
-        "7": [33, 36], "8": [36, 40], "9": [40, 44], "10": [44, 49], "11": [49, inf]
+        "1": [0, 20], "2": [20, 22.5], "3": [22.5, 25], "4": [25, 27.5], "5": [27.5, 30], "6": [30, 33], "7": [33, 36],
+        "8": [36, 40], "9": [40, 44], "10": [44, 49], "11": [49, inf]
     },
     "[9, 11]-all": {
-        "1": [0, 24], "2": [24, 27], "3": [27, 30], "4": [30, 34], "5": [34, 38], "6": [38, 42],
-        "7": [42, 46], "8": [46, 50], "9": [50, 55], "10": [55, 60], "11": [60, inf]
+        "1": [0, 24], "2": [24, 27], "3": [27, 30], "4": [30, 34], "5": [34, 38], "6": [38, 42], "7": [42, 46],
+        "8": [46, 50], "9": [50, 55], "10": [55, 60], "11": [60, inf]
     },
-    "[18, inf]-all": {
-        "1": [0, 57.38], "2": [57.38, 69.96], "3": [69.96, 75.98], "4": [75.98, 82.1], "5": [82.1, 88.2],
-        "6": [88.2, 94.12], "7": [94.12, 100.24], "8": [100.24, inf]
-   }
+    "[12, 13]-male": {
+        "1": [0, 34], "2": [34, 37], "3": [37, 41], "4": [41, 45], "5": [45, 50], "6": [50, 55], "7": [55, 60],
+        "8": [60, 65], "9": [65, 70], "10": [70, 75], "11": [75, inf]
+    },
+    "[12, 13]-female": {
+        "1": [0, 32], "2": [32, 35], "3": [35, 38], "4": [38, 42], "5": [42, 46], "6": [46, 50], "7": [50, 54],
+        "8": [54, 59], "9": [59, 63], "10": [63, 68], "11": [68, 75], "12": [75, inf]
+    },
+    "[14, 15]-male": {
+        "1": [0, 38], "2": [38, 42], "3": [42, 46], "4": [46, 50], "5": [50, 55], "6": [55, 60], "7": [60, 65],
+        "8": [65, 70], "9": [70, 75], "10": [75, 80], "11": [80, inf]
+    },
+    "[14, 15]-female": {
+        "1": [0, 36], "2": [36, 39], "3": [39, 42], "4": [42, 46], "5": [46, 50], "6": [50, 54], "7": [54, 59],
+        "8": [59, 63], "9": [63, 68], "10": [68, 75], "11": [75, 80], "12": [80, inf]
+    },
+    "[16, 17]-male": {
+        "1": [0, 46], "2": [46, 50], "3": [50, 55], "4": [55, 60], "5": [60, 65], "6": [65, 70], "7": [70, 76],
+        "8": [76, 83], "9": [83, 91], "10": [91, inf]
+    },
+    "[16, 17]-female": {
+        "1": [0, 40], "2": [40, 44], "3": [44, 48], "4": [48, 52], "5": [52, 57], "6": [57, 62], "7": [62, 68],
+        "8": [68, 73], "9": [73, inf]
+    },
+    "[18, 29]-male": {
+        "1": [0, 50], "2": [50, 55], "3": [55, 60], "4": [60, 65], "5": [65, 70], "6": [70, 76], "7": [76, 83],
+        "8": [83, 91], "9": [91, 98], "10": [98, inf]
+    },
+    "[18, 29]-female": {
+        "1": [0, 44], "2": [44, 48], "3": [48, 52], "4": [52, 57], "5": [57, 62], "6": [62, 68], "7": [68, 73],
+        "8": [73, 80], "9": [80, inf]
+    },
+    "[30, 35]-male": {
+        "1": [0, 55], "2": [55, 60], "3": [60, 65], "4": [65, 70], "5": [70, 76], "6": [76, 83], "7": [83, 91],
+        "8": [91, 98], "9": [98, 110], "10": [110, inf]
+    },
+    "[30, 35]-female": {
+        "1": [0, 44], "2": [44, 48], "3": [48, 52], "4": [52, 57], "5": [57, 62], "6": [62, 68], "7": [68, 73],
+        "8": [73, 80], "9": [80, 87], "10": [87, inf]
+    },
+    "[36, 40]-male": {
+        "1": [0, 55], "2": [55, 60], "3": [60, 65], "4": [65, 70], "5": [70, 76], "6": [76, 83], "7": [83, 91],
+        "8": [91, 98], "9": [98, 110], "10": [110, inf]
+    },
+    "[36, 40]-female": {
+        "1": [0, 44], "2": [44, 48], "3": [48, 52], "4": [52, 57], "5": [57, 62], "6": [62, 68], "7": [68, 73],
+        "8": [73, 80], "9": [80, 87], "10": [87, 94], "11": [94, inf]
+    },
+    "[41, 45]-male": {
+        "1": [0, 55], "2": [55, 60], "3": [60, 65], "4": [65, 70], "5": [70, 76], "6": [76, 83], "7": [83, 91],
+        "8": [91, 98], "9": [98, 110], "10": [110, inf]
+    },
+    "[41, 45]-female": {
+        "1": [0, 44], "2": [44, 48], "3": [48, 52], "4": [52, 57], "5": [57, 62], "6": [62, 68], "7": [68, 73],
+        "8": [73, 80], "9": [80, 87], "10": [87, 94], "11": [94, inf]
+    },
+    "[46, 50]-male": {
+        "1": [0, 55], "2": [55, 60], "3": [60, 65], "4": [65, 70], "5": [70, 76], "6": [76, 83], "7": [83, 91],
+        "8": [91, 98], "9": [98, 110], "10": [110, inf]
+    },
+    "[46, 50]-female": {
+        "1": [0, 44], "2": [44, 48], "3": [48, 52], "4": [52, 57], "5": [57, 62], "6": [62, 68], "7": [68, 73],
+        "8": [73, 80], "9": [80, 87], "10": [87, 94], "11": [94, inf]
+    },
+    "[51, inf]-all": {
+        "1": [0, inf]
+    }
 }
-ages = {"June1": [4, 5], "June2": [6, 7], "June3": [8, 9], "June4": [10, 11], "Teen1": [12, 13], "Teen2": [14, 15], "Teen3": [16, 17], "Master0": [18, 29], "Master1": [30, 35], "Master2": [36, 40], "Master3": [41, 45], "Master4": [46, 50], "Master5": [51, inf]}
+ages = {"June1": [4, 5], "June2": [6, 7], "June3": [8, 9], "June4": [10, 11], "Teen1": [12, 13], "Teen2": [14, 15],
+        "Teen3": [16, 17], "Master0": [18, 29], "Master1": [30, 35], "Master2": [36, 40], "Master3": [41, 45],
+        "Master4": [46, 50], "Master5": [51, inf]}
 translate_sex = {"male": "мужской", "female": "женский", "?": "?"}
 translate_sex_reverse = {"Мужской": "male", "Женский": "female", "?": "?"}
 base_names = ["Иван", "Алесей", "Тимофей", "Дмитрий", "Максим", "Александр", "Сергей", "Илья"]
@@ -59,7 +138,7 @@ def check_weight(_weights, _age, _weight_name, _sex):
     for _ages, weights_ in _weights.items():
         _ages = _ages.split("-")
         if _ages[1] != "all":
-            if _ages[1] != _sex:
+            if _ages[1] != translate_sex_reverse[_sex]:
                 continue
         _ages[0] = eval(_ages[0])
         if _age > _ages[0][1]:
@@ -69,11 +148,11 @@ def check_weight(_weights, _age, _weight_name, _sex):
                 return weight_vals
 
 
-def name_weight(_weights, _age, _weight):
+def name_weight(_weights, _age, _weight, _sex):
     for _ages, weights_ in _weights.items():
         _ages = _ages.split("-")
         if _ages[1] != "all":
-            if _ages[1] != _sex:
+            if _ages[1] != translate_sex_reverse[_sex]:
                 continue
         _ages[0] = eval(_ages[0])
         # print(_ages, _age)
@@ -107,6 +186,9 @@ class People:
         self.state = state
         self.tg_id = id_tg
 
+    def fio(self):
+        return f"{self.surname} {list(self.name)[0]}. {list(self.last_name)[0]}."
+
 
 class Place:
     def __init__(self, f: dict, max_n=7):
@@ -118,33 +200,33 @@ class Place:
             # print(data_of_people(i))
             if i.belt in self.pos[i.sex].keys():
                 if name_age(ages, i.age) in self.pos[i.sex][i.belt].keys():
-                    if name_weight(weights, i.age, i.weight) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                    if name_weight(weights, i.age, i.weight, i.sex) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
                     else:
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)] = {}
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)] = {}
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
                 else:
                     self.pos[i.sex][i.belt][name_age(ages, i.age)] = {}
-                    if name_weight(weights, i.age, i.weight) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                    if name_weight(weights, i.age, i.weight, i.sex) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
                     else:
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)] = {}
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)] = {}
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
             else:
                 self.pos[i.sex][i.belt] = {}
                 if name_age(ages, i.age) in self.pos[i.sex][i.belt].keys():
-                    if name_weight(weights, i.age, i.weight) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                    if name_weight(weights, i.age, i.weight, i.sex) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
                     else:
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)] = {}
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)] = {}
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
                 else:
                     self.pos[i.sex][i.belt][name_age(ages, i.age)] = {}
-                    if name_weight(weights, i.age, i.weight) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                    if name_weight(weights, i.age, i.weight, i.sex) in self.pos[i.sex][i.belt][name_age(ages, i.age)].keys():
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
                     else:
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)] = {}
-                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight)][name(i)] = i
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)] = {}
+                        self.pos[i.sex][i.belt][name_age(ages, i.age)][name_weight(weights, i.age, i.weight, i.sex)][name(i)] = i
         # print(self.pos)
         self.groups = {}
         n = 1
@@ -274,6 +356,21 @@ def len_(mas):
     for i in mas.values():
         if i.state == False:
             return True
+
+
+def beautiful_output(data_cur, tupe):
+    out = ""
+    if tupe == "p":
+        return data_cur.fio(), data_cur.age, data_cur.weight
+    elif tupe in ("a", "w"):
+        # data_cur = data_cur.split("-")
+        if data_cur is None:
+            return "Error"
+        if data_cur[1] == inf:
+            out += f"{data_cur[0]}+"
+        else:
+            out += f"до {data_cur[1]}"
+    return out
 
 
 def compute_without_gui(path):
@@ -560,6 +657,8 @@ def open_db(path):
                 a = peoples[f"{data_[1]};{data_[2]};{data_[3]}{q}"]
                 q = int_(q) + 1
             except:
+                data_ = list(data_)
+                data_[5] = date.today().year - int(data_[5])
                 peoples[f"{data_[1]};{data_[2]};{data_[3]}{q}"] = People(*data_[1:9])
                 del q
                 break
@@ -612,9 +711,7 @@ def add_window():
 
 # print(find(["abccde", "abcde", "edcba", "qwerty", "bcd"], "bcd"))
 
-# data_base = DBMS.create_connection(filedialog.askopenfile().name)
-# DBMS.execute_query(data_base, "DELETE FROM competitors WHERE id >= 0")
-# DBMS.execute_query(data_base, "DROPTABLE competitors")
+# data_base = DBMS.create_connection(f"{sys.path}\\database.sqlite")
 # DBMS.execute_query(data_base, """CREATE TABLE IF NOT EXISTS competitors (
 #   id INTEGER PRIMARY KEY,
 #   surname TEXT,
@@ -625,6 +722,8 @@ def add_window():
 #   weight FLOAT,
 #   sex TEXT
 # );""")
+# DBMS.execute_query(data_base, "DELETE FROM competitors WHERE id >= 0")
+# DBMS.execute_query(data_base, "DROPTABLE competitors")
 # for i in range(150):
 #     rand_nam = rand_name()
 #     DBMS.execute_query(data_base, f"""
@@ -635,21 +734,23 @@ def add_window():
 #         """)
 
 
-for i in range(150):
-    nams = rand_name()
-    q = ""
-    # q = int_(q) + 1
-    while True:
-        try:
-            a = peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"]
-            q = int_(q) + 1
-        except:
-            peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"] = People(*nams, choice(["Мужской", "Женский"]), randint(4, 79), randint(150, 950) / 10, belts[randint(0, 16)], True)
-            del(q)
-            break
-
-
 if __name__ == "__main__":
+    for i in range(150):
+        nams = rand_name()
+        q = ""
+        # q = int_(q) + 1
+        while True:
+            try:
+                a = peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"]
+                q = int_(q) + 1
+            except:
+                peoples[f"{nams[0]};{nams[1]};{nams[2]}{q}"] = People(*nams, choice(["Мужской", "Женский"]),
+                                                                      randint(4, 79), randint(150, 950) / 10,
+                                                                      belts[randint(0, 16)], True)
+                del (q)
+                break
+
+
     main_frame = tkinter.Frame(windows["main"], relief=RIDGE)
     main_frame.pack(fill=BOTH, expand=1)
 

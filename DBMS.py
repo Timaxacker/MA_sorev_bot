@@ -19,12 +19,8 @@ def execute_query_values(connection, query, values):
     error = False
     
     cursor = connection.cursor()
-    try:
-        cursor.execute(query, values)
-        connection.commit()
-    except Error as e:
-        error = True
-        print(f"The error '{e}' occurred")
+    cursor.execute(query, values)
+    connection.commit()
 
 
 def execute_query(connection, query):
@@ -50,7 +46,7 @@ def execute_read_query(connection, query):
 
 create_competitors_table = """
 CREATE TABLE IF NOT EXISTS competitors (
-  id INTEGER PRIMARY KEY,
+  id TEXT PRIMARY KEY,
   surname TEXT,
   name TEXT,
   patronymic TEXT,
@@ -242,12 +238,12 @@ def output(connection):
 
 
 
-surnames = ["Хуеглотов", "Лазарев", "Белобородов", "Пидоро", "Ващенко"]
-names = ["Валера", "Гоша", "Серёжа", "Виктор", "Олежа"]
-patronymics = ["Алексеевич", "Михалыч", "Игнатич", "Буратиныч", "Виcсарионович"]
+surnames = ["Поляков", "Лазарев", "Белобров", "Куканов", "Кудаев"]
+names = ["Кирилл", "Тимофей", "Павел", "Алексей", "Евдакий"]
+patronymics = ["Алексеевич", "Михайлович", "Сергеевич", "Максимович", "Кириллович"]
 sex = ["Мужской", "Женский"]
-age = [1939, 1941, 1991, 2014, 1917]
-weight = [1, 110, 77, 69, 11]
+age = [2008, 1980, 1991, 2001, 2015]
+weight = [66, 110, 77, 35, 86]
 belt = ["Белый", "Серо-белый", "Серый", "Серо-чёрный", "Жёлто-белый", "Жёлтый", "Жёлто-чёрный", "Зелёно-белый", "Зелёный",
     "Зелёно-чёрный", "Синий", "Фиолетовый", "Коричневый", "Чёрный", "Красно-чёрный", "Красно-белый", "Красный"]
 teams = ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]
