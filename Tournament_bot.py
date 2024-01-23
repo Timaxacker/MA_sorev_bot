@@ -12,7 +12,7 @@ import sys
 import setka
 import csv
 
-
+"""
 data = setka.compute_without_gui(f"{sys.path[0]}\\database.sqlite")
 with open('categories.csv', 'w') as f:
     writer = csv.writer(f, delimiter=';')
@@ -32,7 +32,7 @@ with open('categories.csv', 'w') as f:
             rows.append(('-', d[0], d[1], d[2]))
         rows.append(())
     writer.writerows(rows)
-
+"""
 
 bot = telebot.TeleBot(open('API.txt', 'r').read())
 # print(f"{sys.path[0]}database.sqlite")
@@ -382,7 +382,7 @@ def check(m):
         q = 0
         while True:
             try:
-                info = (f'{str(m.from_user.id)}_{str(q)}', ) +  tuple(information[m.from_user.id][:5]) + tuple(information[m.from_user.id][6:])
+                info = (f'{m.from_user.id}_{q}', ) +  tuple(information[m.from_user.id][:6]) + tuple(information[m.from_user.id][7:])
                 DBMS.add_information_in_competitors(connection, info)
                 break
 
@@ -401,12 +401,6 @@ def check(m):
 
             answer = "Нажмите на /start"
             bot.send_message(m.chat.id, answer)
-            
-
-        
-        
-        
-
 
 
         else:
