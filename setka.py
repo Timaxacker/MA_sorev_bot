@@ -6,6 +6,7 @@ from random import randint, choice
 from math import inf
 from datetime import date
 import DBMS
+from exceptionHandler import *
 
 
 belts = [
@@ -123,6 +124,7 @@ base_surnames = ["Петров", "Иванов", "Попов", "Васюков",
 base_last_names = ["Михайлович", "Дмитриевич", "Максимович", "Ильич", "Анатольевич", "Дьяченко"]
 
 
+@exceptioHandlerBot()
 def is_int(val):
     try:
         float(val)
@@ -131,9 +133,11 @@ def is_int(val):
         return False
 
 
+# @exceptioHandlerBot()
 # def list_from_dict(a: dict)
 
 
+@exceptioHandlerBot()
 def check_weight(_weights, _age, _weight_name, _sex):
     for _ages, weights_ in _weights.items():
         _ages = _ages.split("-")
@@ -148,6 +152,7 @@ def check_weight(_weights, _age, _weight_name, _sex):
                 return weight_vals
 
 
+@exceptioHandlerBot()
 def name_weight(_weights, _age, _weight, _sex):
     for _ages, weights_ in _weights.items():
         _ages = _ages.split("-")
@@ -167,6 +172,7 @@ def name_weight(_weights, _age, _weight, _sex):
     # print(111111111111111111111111111111111111111111111111)
 
 
+@exceptioHandlerBot()
 def name_age(_ages, _age):
     for age_name, age_vals in _ages.items():
         # print(age_vals)
@@ -175,6 +181,7 @@ def name_age(_ages, _age):
 
 
 class People:
+    @exceptioHandlerBot()
     def __init__(self, surname, name, last_name, sex, age, weight, belt, state=False, id_tg=-1):
         self.surname = surname
         self.name = name
@@ -186,11 +193,13 @@ class People:
         self.state = state
         self.tg_id = id_tg
 
+    @exceptioHandlerBot()
     def fio(self):
-        return f"{self.surname} {list(self.name)[0]}. {list(self.last_name)[0]}."
+        return f"{self.surname} {self.name[0:1]}. {self.last_name[0:1]}."
 
 
 class Place:
+    @exceptioHandlerBot()
     def __init__(self, f: dict, max_n=7):
         self.pos = {"Мужской": {}, "Женский": {}}
         for i in f.values():
@@ -244,6 +253,7 @@ class Place:
                         n += 1
 
 
+# @exceptioHandlerBot()
 # def find(data1: Place, name1):
 #     groups = data1.groups.copy()
 #     out = {}
@@ -262,6 +272,7 @@ class Place:
 #             out[people_name] = n
 
 
+@exceptioHandlerBot()
 def list_(a):
     out = []
     for k in a:
@@ -270,6 +281,7 @@ def list_(a):
     return out
 
 
+@exceptioHandlerBot()
 def find(a, b):
     out = []
     b = b.split(";")
@@ -352,12 +364,14 @@ def find(a, b):
     return out
 
 
+@exceptioHandlerBot()
 def len_(mas):
     for i in mas.values():
         if i.state == False:
             return True
 
 
+@exceptioHandlerBot()
 def beautiful_output(data_cur, tupe):
     out = ""
     if tupe == "p":
@@ -373,11 +387,13 @@ def beautiful_output(data_cur, tupe):
     return out
 
 
+@exceptioHandlerBot()
 def compute_without_gui(path):
     open_db(path)
     return Place(peoples)
 
 
+@exceptioHandlerBot()
 def compute():
     global data, entry_belt_main, entry_age_main, entry_weight_main, entry_people_main, label_people_data_main, entry_group_n_main, label_group_date, label_group_peoples, label_choice_age_actyal, label_choice_weight_actyal, entry_group_find, entry_sex_main
     if len(peoples) == 0 or len_(peoples):
@@ -474,6 +490,7 @@ def compute():
     #     pass
 
 
+@exceptioHandlerBot()
 def print_(mas):
     out = ""
     for i in mas:
@@ -481,6 +498,7 @@ def print_(mas):
     return out
 
 
+@exceptioHandlerBot()
 def data_of_people(people=People("?", "?", "?", "?", "?", "?", "?")):
     out = "ФИО: "
     out += f"{people.surname} {people.name} {people.last_name}\n"
@@ -491,6 +509,7 @@ def data_of_people(people=People("?", "?", "?", "?", "?", "?", "?")):
     return out
 
 
+@exceptioHandlerBot()
 def rand_name():
     # out = chr(randint(65, 90))
     # for i in range(randint(1, 2)):
@@ -499,10 +518,12 @@ def rand_name():
     return [choice(base_surnames), choice(base_names), choice(base_last_names)]
 
 
+@exceptioHandlerBot()
 def name(people):
     return f"{people.surname};{people.name};{people.last_name}"
 
 
+@exceptioHandlerBot()
 def names(array):
     out = []
     for people in array:
@@ -510,6 +531,7 @@ def names(array):
     return out
 
 
+@exceptioHandlerBot()
 def keys(dict_):
     out = []
     if type(dict_) == list:
@@ -519,6 +541,7 @@ def keys(dict_):
     return out
 
 
+@exceptioHandlerBot()
 def int_(a):
     if a == "":
         return 0
@@ -526,14 +549,17 @@ def int_(a):
         return a
 
 
+@exceptioHandlerBot()
 def delete():
     del peoples[keys(peoples)[combobox_people.current()]]
 
 
+@exceptioHandlerBot()
 def check_c():
     print(state.get())
 
 
+@exceptioHandlerBot()
 def change():
     global belts, entry_surname, entry_name, entry_last_name, entry_age, entry_belt, entry_weight, entry_state, b, state
     b = keys(peoples)[combobox_people.current()]
@@ -587,6 +613,7 @@ def change():
     windows["change"].update()
 
 
+@exceptioHandlerBot()
 def add():
     global b, entry_state
     values = [entry_surname.get(), entry_name.get(), entry_last_name.get(), entry_age.get(), belts[entry_belt.current()], entry_weight.get()]
@@ -638,10 +665,12 @@ def add():
     #     mb.showinfo("Возникла ошибка.", f"{e}\n\nПожалуста, собщите об ошибке.")
 
 
+@exceptioHandlerBot()
 def open_db_1():
     open_db(filedialog.askopenfile().name)
 
 
+@exceptioHandlerBot()
 def open_db(path):
     global peoples
     # print(filedialog.askopenfile().name)
@@ -662,8 +691,10 @@ def open_db(path):
                 peoples[f"{data_[1]};{data_[2]};{data_[3]}{q}"] = People(*data_[1:9])
                 del q
                 break
+#     print(peoples)
 
 
+@exceptioHandlerBot()
 def add_window():
     global belts, entry_surname, entry_name, entry_last_name, entry_age, entry_belt, entry_weight
     windows["add"] = tkinter.Tk(className="Добовление человека.")
