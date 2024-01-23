@@ -80,14 +80,14 @@ def start(m, res=False):
         bot.register_next_step_handler(m, admin_code)
 
     else:
-        answer = 'Для продолжения Вам требуется согласиться на <a href="https://10.rkn.gov.ru/docs/10/Pravila_obrabotki_PD.pdf">обработку персональных данных</a>'
+        answer = 'Для продолжения Вам <u><i><b>требуется</b></i></u> согласиться на <a href="https://10.rkn.gov.ru/docs/10/Pravila_obrabotki_PD.pdf">обработку персональных данных</a>'
         bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, pers_data)
 
 
 @exch.exceptioHandlerBot(level=0)
 # @bot.message_handler(content_types=["text"])
-def pers_data(m):
+def _pers_data(m):
     information[m.from_user.id] = []
 
     if m.text.strip() == "Согласен(а)":
@@ -103,6 +103,15 @@ def pers_data(m):
     else:
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
+        bot.register_next_step_handler(m, pers_data)
+    return True
+def pers_data(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _pers_data(m):
+            bot.register_next_step_handler(m, pers_data)
+    else:
         bot.register_next_step_handler(m, pers_data)
 
 
@@ -124,12 +133,19 @@ def _admin_code(m):
         answer = "Пароль неверный(\nФИО)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
+    return True
 def admin_code(m):
-    _admin_code(m)
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _admin_code(m):
+            bot.register_next_step_handler(m, admin_code)
+    else:
+        bot.register_next_step_handler(m, admin_code)
 
 
 @exch.exceptioHandlerBot(level=0)
-def fio(m):
+def _fio(m):
     mess = m.text.strip()
     mas = []
     p = ""
@@ -165,10 +181,19 @@ def fio(m):
         answer = "Выберите, пожалуйста, пол участника"
         bot.send_message(m.chat.id, answer, reply_markup=markup)
         bot.register_next_step_handler(m, sex)
+    return True
+def fio(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _fio(m):
+            bot.register_next_step_handler(m, fio)
+    else:
+        bot.register_next_step_handler(m, fio)
 
 
 @exch.exceptioHandlerBot(level=0)
-def sex(m):
+def _sex(m):
     if m.text.strip() in ["Мужской", "Женский"]:
         information[m.from_user.id].append(m.text.strip())
 
@@ -184,10 +209,19 @@ def sex(m):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, sex)
+    return True
+def sex(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _sex(m):
+            bot.register_next_step_handler(m, sex)
+    else:
+        bot.register_next_step_handler(m, sex)
 
 
 @exch.exceptioHandlerBot(level=0)
-def born_year(m):
+def _born_year(m):
     for i in range(date.today().year-4, date.today().year-105, -1):
         if m.text.strip() == str(i):
             information[m.from_user.id].append(m.text.strip())
@@ -202,11 +236,19 @@ def born_year(m):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, born_year)
-    
+    return True
+def born_year(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _born_year(m):
+            bot.register_next_step_handler(m, born_year)
+    else:
+        bot.register_next_step_handler(m, born_year)
 
-    
+
 @exch.exceptioHandlerBot(level=0)
-def weight(m):
+def _weight(m):
     try:
         weight_check = ""
         for lett in m.text.strip():
@@ -329,10 +371,19 @@ def weight(m):
         answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, weight)
+    return True
+def weight(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _weight(m):
+            bot.register_next_step_handler(m, weight)
+    else:
+        bot.register_next_step_handler(m, weight)
 
 
 @exch.exceptioHandlerBot(level=0)
-def belt(m):
+def _belt(m):
 #     print(information[m.from_user.id])
     if m.text.strip() in information[m.from_user.id][7]:
         information[m.from_user.id].pop(7)
@@ -354,9 +405,19 @@ def belt(m):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, belt)
-    
+    return True
+def belt(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _belt(m):
+            bot.register_next_step_handler(m, belt)
+    else:
+        bot.register_next_step_handler(m, belt)
+
+
 @exch.exceptioHandlerBot(level=0)   
-def team(m):
+def _team(m):
     if m.text.strip() in ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]:
         information[m.from_user.id].append(m.text.strip())
 
@@ -373,20 +434,37 @@ def team(m):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, team)
+    return True
+def team(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _team(m):
+            bot.register_next_step_handler(m, team)
+    else:
+        bot.register_next_step_handler(m, team)
 
-    
+
 @exch.exceptioHandlerBot(level=0)
-def other_team(m):
+def _other_team(m):
     information[m.from_user.id].append(m.text.strip())
     
     answer = "Напишите, пожалуйста, фамилию и имя тренера"
     bot.send_message(m.chat.id, answer)
     bot.register_next_step_handler(m, trainer)
-
+    return True
+def other_team(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _other_team(m):
+            bot.register_next_step_handler(m, other_team)
+    else:
+        bot.register_next_step_handler(m, other_team)
 
 
 @exch.exceptioHandlerBot(level=0)
-def trainer(m):
+def _trainer(m):
     information[m.from_user.id].append(m.text.strip())
 
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -397,10 +475,19 @@ def trainer(m):
     answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][7]}\nКоманда: {information[m.from_user.id][8]}\nТренер: {information[m.from_user.id][9]}"
     bot.send_message(m.chat.id, answer, reply_markup=markup)
     bot.register_next_step_handler(m, check)
+    return True
+def trainer(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _trainer(m):
+            bot.register_next_step_handler(m, trainer)
+    else:
+        bot.register_next_step_handler(m, trainer)
 
 
 @exch.exceptioHandlerBot(level=0)
-def check(m):
+def _check(m):
     if m.text.strip() == 'Всё корректно':
         q = 0
         while True:
@@ -456,10 +543,19 @@ def check(m):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, check)
+    return True
+def check(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _check(m):
+            bot.register_next_step_handler(m, check)
+    else:
+        bot.register_next_step_handler(m, check)
 
 
 @exch.exceptioHandlerBot(level=0)
-def new_competitor(m):
+def _new_competitor(m):
     if m.text.strip() == "Зарегестрировать еще одного участника":
         answer = "Напишите, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
         bot.send_message(m.chat.id, answer)
@@ -469,10 +565,19 @@ def new_competitor(m):
         answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, new_competitor)
+    return True
+def new_competitor(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _new_competitor(m):
+            bot.register_next_step_handler(m, new_competitor)
+    else:
+        bot.register_next_step_handler(m, new_competitor)
 
 
 @exch.exceptioHandlerBot(level=0)
-def criter(m):
+def _criter(m):
     global new_value_ind
     new_value_ind = None
 
@@ -528,10 +633,19 @@ def criter(m):
             answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
             bot.send_message(m.chat.id, answer)
             bot.register_next_step_handler(m, criter)
-        
+    return True
+def criter(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _criter(m):
+            bot.register_next_step_handler(m, criter)
+    else:
+        bot.register_next_step_handler(m, criter)
+
 
 @exch.exceptioHandlerBot(level=0)
-def new_value(m):
+def _new_value(m):
     val_pass = None
     
     if new_value_ind in [0, 1, 2]:
@@ -732,8 +846,16 @@ def new_value(m):
 
     else:
         bot.register_next_step_handler(m, new_value)
+    return True
+def new_value(m):
+    if m.text is not None:
+        if m.text.strip() == "/end":
+            return
+        if not _new_value(m):
+            bot.register_next_step_handler(m, new_value)
+    else:
+        bot.register_next_step_handler(m, new_value)
 
-    
 
 @exch.exceptioHandlerBot(level=0)
 def _admin_menu(m):
@@ -742,7 +864,7 @@ def _admin_menu(m):
         with open('input.txt', 'w', encoding = 'UTF-8') as f:
             print('%-14s %-14s %-14s %-14s %-14s %-14s %-14s %-14s' % ("ID", "Фамилия", "Имя", "Отчество", "Пол", "Год рождения", "Вес", "Пояс"), file = f)
         
-        competitors = DBMS.execute_read_query(connection, DBMS.select_competitors)
+        e_read_query(connection, DBMS.select_competitors)
         
         try:
             with open('input.txt', 'a', encoding = 'UTF-8') as f:
@@ -830,11 +952,21 @@ def _admin_menu(m):
         bot.register_next_step_handler(m, admin_menu)
     return True
 def admin_menu(m):
-    if m is not None:
+    if m.text is not None:
         if m.text.strip() == "/end":
             return
-    if not _admin_menu(m):
+        if not _admin_menu(m):
+            bot.register_next_step_handler(m, admin_menu)
+    else:
         bot.register_next_step_handler(m, admin_menu)
+
+
+def send_error(text):
+    for id_tg in eval(open('Admins ID.txt', 'r').read()):
+        try:
+            bot.send_message(id_tg, text)
+        except:
+            pass
 
 
 while True:
@@ -845,6 +977,5 @@ while True:
         error = traceback.TracebackException(exc_type=type(e), exc_traceback=e.__traceback__, exc_value=e).stack[-1]
         errorText = f"An Error has handled at time: \"{datetime.now()}\":\n+>\"{e.__repr__()}\" at line {error.lineno} in func \"bot.polling\", code:\n->\"\"\"{error.line}\"\"\"\nPlease restart the bot."
         print(errorText)
-        for id_tg in eval(open('Admins ID.txt', 'r').read()):
-            bot.send_message(id_tg, errorText)
+        send_error(errorText)
 

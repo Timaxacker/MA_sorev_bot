@@ -128,8 +128,7 @@ def exceptioHandlerBot(level=1, fileName=""):
                             errorText += errorTextP[i]
                     errorLog = {}
                     print(errorText)
-                    for id_tg in eval(open('Admins ID.txt', 'r').read()):
-                        bot.send_message(id_tg, errorText)
+                    send_error(errorText)
                     bot.send_message(args[0].chat.id, "Возикла ошибка. Данные о ней уже отправленны раработчикам.")
                     # print(errorLog)
                     return False
@@ -137,6 +136,14 @@ def exceptioHandlerBot(level=1, fileName=""):
                     return func(*args, **kwargs)
         return wrapper
     return handler
+
+
+def send_error(text):
+    for id_tg in eval(open('Admins ID.txt', 'r').read()):
+        try:
+            bot.send_message(id_tg, text)
+        except:
+            pass
 
 
 if __name__ == "__main__":
