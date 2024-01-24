@@ -80,7 +80,7 @@ def start(m, res=False):
         bot.register_next_step_handler(m, admin_code)
 
     else:
-        answer = 'Для продолжения Вам <u><i><b>требуется</b></i></u> согласиться на <a href="https://10.rkn.gov.ru/docs/10/Pravila_obrabotki_PD.pdf">обработку персональных данных</a>'
+        answer = 'Для продолжения Вам <u><i><b>ТРЕБУЕТСЯ</b></i></u> согласиться на <a href="https://10.rkn.gov.ru/docs/10/Pravila_obrabotki_PD.pdf">обработку персональных данных</a>'
         bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, pers_data)
 
@@ -91,20 +91,22 @@ def _pers_data(m):
     information[m.from_user.id] = []
 
     if m.text.strip() == "Согласен(а)":
-        answer = "Напишите, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, fio)
 
     elif m.text.strip() == "Не согласен(а)":
-        answer = "Для продолжения Вам требуется согласится на обработку персональных данных"
-        bot.send_message(m.chat.id, answer)
+        answer = "Для продолжения Вам <u><i><b>ТРЕБУЕТСЯ</b></i></u> согласится на обработку персональных данных"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, pers_data)
 
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, pers_data)
     return True
+
+
 def pers_data(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -134,6 +136,8 @@ def _admin_code(m):
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
     return True
+
+
 def admin_code(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -161,8 +165,8 @@ def _fio(m):
     del(p, mess)
 
     if len(mas) != 3:
-        answer = "ФИО введен некорректно! Попытайтесь ещё раз. Вводите ФИО в три слова через пробел.\n(Пример: Иванов Иван Иванович)" 
-        bot.send_message(m.chat.id, answer)
+        answer = "ФИО введен некорректно! Попытайтесь ещё раз. <u><i><b>ВВОДИТЕ</b></i></u> ФИО в три слова через пробел.\n(Пример: Иванов Иван Иванович)" 
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, fio)
 
     else:
@@ -178,10 +182,12 @@ def _fio(m):
             markup.add(types.KeyboardButton(i))
 
 
-        answer = "Выберите, пожалуйста, пол участника"
-        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u>, пожалуйста, пол участника"
+        bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, sex)
     return True
+
+
 def fio(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -201,15 +207,17 @@ def _sex(m):
         for i in range(date.today().year-4, date.today().year-105, -1):
             markup.add(types.KeyboardButton(str(i)))
 
-        answer = "Выберите, пожалуйста, год рождения участника"
-        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u>, пожалуйста, год рождения участника"
+        bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, born_year)
 
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, sex)
     return True
+
+
 def sex(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -226,17 +234,19 @@ def _born_year(m):
         if m.text.strip() == str(i):
             information[m.from_user.id].append(m.text.strip())
             
-            answer = "Напишите, пожалуйста, вес участника в кг\n(60)"
-            bot.send_message(m.chat.id, answer)
+            answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, вес участника в кг\n(60)"
+            bot.send_message(m.chat.id, answer, parse_mode="HTML")
             bot.register_next_step_handler(m, weight)
             
             break
     
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, born_year)
     return True
+
+
 def born_year(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -363,8 +373,8 @@ def _weight(m):
         for i in lst_of_but:
             markup.add(types.KeyboardButton(i))
 
-        answer = "Выберите, пожалуйста, пояс участника"
-        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u>, пожалуйста, пояс участника"
+        bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, belt)
     
     except:
@@ -372,6 +382,8 @@ def _weight(m):
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, weight)
     return True
+
+
 def weight(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -396,16 +408,18 @@ def _belt(m):
             markup.add(types.KeyboardButton(i))
 
 
-        answer = "Выберите, пожалуйста, команду участника"
-        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u>, пожалуйста, команду участника"
+        bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, team)
         
 
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, belt)
     return True
+
+
 def belt(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -421,20 +435,22 @@ def _team(m):
     if m.text.strip() in ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]:
         information[m.from_user.id].append(m.text.strip())
 
-        answer = "Напишите, пожалуйста, фамилию и имя тренера"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, фамилию и имя тренера"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, trainer)
 
     elif m.text.strip() == "Другая команда":
-        answer = "Напишите, пожалуйста, название команды"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, название команды"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, other_team)
 
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, team)
     return True
+
+
 def team(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -449,8 +465,8 @@ def team(m):
 def _other_team(m):
     information[m.from_user.id].append(m.text.strip())
     
-    answer = "Напишите, пожалуйста, фамилию и имя тренера"
-    bot.send_message(m.chat.id, answer)
+    answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, фамилию и имя тренера"
+    bot.send_message(m.chat.id, answer, parse_mode="HTML")
     bot.register_next_step_handler(m, trainer)
     return True
 def other_team(m):
@@ -476,6 +492,8 @@ def _trainer(m):
     bot.send_message(m.chat.id, answer, reply_markup=markup)
     bot.register_next_step_handler(m, check)
     return True
+
+
 def trainer(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -493,14 +511,12 @@ def _check(m):
         while True:
             
             try:
-                info = (f'{m.from_user.id}_{q}', ) +  tuple(information[m.from_user.id][:6]) + tuple(information[m.from_user.id][7:])
+                info = (f'{m.from_user.id}_{q}', ) + tuple(information[m.from_user.id][:6]) + tuple(information[m.from_user.id][7:])
                 DBMS.add_information_in_competitors(connection, info)
                 break
 
             except:
                 q += 1
-
-
 
 #         for i in range(300):
 #             print(i)
@@ -511,19 +527,19 @@ def _check(m):
             answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
             bot.send_message(m.chat.id, answer)
 
-            answer = "Нажмите на /start"
-            bot.send_message(m.chat.id, answer)
+            answer = "<u><i><b>НАЖМИТЕ</b></i></u> на /start"
+            bot.send_message(m.chat.id, answer, parse_mode="HTML")
 
 
         else:
             markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
-            lst_of_but = ["Зарегестрировать еще одного участника"]
+            lst_of_but = ["Зарегистрировать еще одного участника"]
             for i in lst_of_but:
                 markup.add(types.KeyboardButton(i))
             
             information[m.from_user.id] = []
 
-            answer = "Вы успешно зарегестрировались"
+            answer = "Вы успешно зарегистрировались"
             bot.send_message(m.chat.id, answer, reply_markup=markup)
             bot.register_next_step_handler(m, new_competitor)
     
@@ -540,10 +556,12 @@ def _check(m):
 
     
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, check)
     return True
+
+
 def check(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -556,16 +574,18 @@ def check(m):
 
 @exch.exceptioHandlerBot(level=0)
 def _new_competitor(m):
-    if m.text.strip() == "Зарегестрировать еще одного участника":
-        answer = "Напишите, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
-        bot.send_message(m.chat.id, answer)
+    if m.text.strip() == "Зарегистрировать еще одного участника":
+        answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, fio)
 
     else:
-        answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, new_competitor)
     return True
+
+
 def new_competitor(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -613,8 +633,8 @@ def _criter(m):
                 markup.add(types.KeyboardButton(i))
 
 
-        answer = "Выберите новое значение"
-        bot.send_message(m.chat.id, answer, reply_markup=markup)
+        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u> новое значение"
+        bot.send_message(m.chat.id, answer, reply_markup=markup, parse_mode="HTML")
         bot.register_next_step_handler(m, new_value)
 
     else:
@@ -624,16 +644,18 @@ def _criter(m):
 
             if m.text.strip() == lst[i]:
                 new_value_ind = i
-                answer = "Напишите новое значение"
-                bot.send_message(m.chat.id, answer)
+                answer = "<u><i><b>НАПИШИТЕ</b></i></u> новое значение"
+                bot.send_message(m.chat.id, answer, parse_mode="HTML")
                 bot.register_next_step_handler(m, new_value)
                 break
 
         else:
-            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-            bot.send_message(m.chat.id, answer)
+            answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer, parse_mode="HTML")
             bot.register_next_step_handler(m, criter)
     return True
+
+
 def criter(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -773,8 +795,8 @@ def _new_value(m):
             val_pass = True
         
         else:
-            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-            bot.send_message(m.chat.id, answer)
+            answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer, parse_mode="HTML")
 
             val_pass = False
 
@@ -789,8 +811,8 @@ def _new_value(m):
                 break
 
         else:
-            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-            bot.send_message(m.chat.id, answer)
+            answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer, parse_mode="HTML")
 
             val_pass = False
 
@@ -810,8 +832,8 @@ def _new_value(m):
             val_pass = True
 
         else:
-            answer = "Нажимайте, пожалуйста, на кнопки, иначе я Вас не понимаю!"
-            bot.send_message(m.chat.id, answer)
+            answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+            bot.send_message(m.chat.id, answer, parse_mode="HTML")
             
             val_pass = False
 
@@ -830,8 +852,8 @@ def _new_value(m):
         answer = "Ой, что-то пошло не так. Пожалуйста, попытайтесь зарегистрироваться ещё раз"
         bot.send_message(m.chat.id, answer)
 
-        answer = "Нажмите на /start"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖМИТЕ</b></i></u> на /start"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
 
 
     if val_pass:
@@ -847,6 +869,8 @@ def _new_value(m):
     else:
         bot.register_next_step_handler(m, new_value)
     return True
+
+
 def new_value(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -947,10 +971,12 @@ def _admin_menu(m):
         
         
     else:
-        answer = "Нажимай на кнопки!"
-        bot.send_message(m.chat.id, answer)
+        answer = "<u><i><b>НАЖИМАЙ</b></i></u> на кнопки!"
+        bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, admin_menu)
     return True
+
+
 def admin_menu(m):
     if m.text is not None:
         if m.text.strip() == "/end":
@@ -978,4 +1004,3 @@ while True:
         errorText = f"An Error has handled at time: \"{datetime.now()}\":\n+>\"{e.__repr__()}\" at line {error.lineno} in func \"bot.polling\", code:\n->\"\"\"{error.line}\"\"\"\nPlease restart the bot."
         print(errorText)
         send_error(errorText)
-
