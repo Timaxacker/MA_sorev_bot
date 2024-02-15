@@ -62,7 +62,7 @@ competitors_db = {}
 @exch.exceptioHandlerBot(level=0)
 @bot.message_handler(commands=["start"])
 def start(m, res=False):
-    information[m.from_user.id] = []
+    information[m.from_user.id] = {}
     
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
     lst_of_but = ["Согласен(а)", "Не согласен(а)"]
@@ -73,7 +73,7 @@ def start(m, res=False):
         markup.add(types.KeyboardButton(i))
 
     if m.from_user.id in eval(open('Admins ID.txt', 'r').read()):
-        information[m.from_user.id] = []
+        information[m.from_user.id] = {}
         
         answer = "Код:"
         bot.send_message(m.chat.id, answer)
@@ -88,7 +88,7 @@ def start(m, res=False):
 @exch.exceptioHandlerBot(level=0)
 # @bot.message_handler(content_types=["text"])
 def _pers_data(m):
-    information[m.from_user.id] = []
+    information[m.from_user.id] = {}
 
     if m.text.strip() == "Согласен(а)":
         answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, ФИО участника\n(Иванов Иван Иванович)"
@@ -131,7 +131,7 @@ def _admin_code(m):
         bot.register_next_step_handler(m, admin_menu)
         
     else:
-        information[m.from_user.id] = []
+        information[m.from_user.id] = {}
         answer = "Пароль неверный(\nФИО)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, fio)
@@ -170,9 +170,9 @@ def _fio(m):
         bot.register_next_step_handler(m, fio)
 
     else:
-
-        for d in mas:
-            information[m.from_user.id].append(d)
+        information[m.from_user.id]["surname"] = mas[0]
+        information[m.from_user.id]["name"] = mas[1]
+        information[m.from_user.id]["patronymic"] = mas[2]
         del(mas)
     
 
@@ -198,10 +198,16 @@ def fio(m):
         bot.register_next_step_handler(m, fio)
 
 
+#@exch.exceptioHandlerBot(level=0)
+#def _phone_number(m):
+
+
+
+
 @exch.exceptioHandlerBot(level=0)
 def _sex(m):
     if m.text.strip() in ["Мужской", "Женский"]:
-        information[m.from_user.id].append(m.text.strip())
+        information[m.from_user.id]["sex"] = m.text.strip()
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
         for i in range(date.today().year-4, date.today().year-105, -1):
@@ -232,10 +238,10 @@ def sex(m):
 def _born_year(m):
     for i in range(date.today().year-4, date.today().year-105, -1):
         if m.text.strip() == str(i):
-            information[m.from_user.id].append(m.text.strip())
+            information[m.from_user.id]["year_born"] = m.text.strip()
             
-            answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, вес участника в кг\n(60)"
-            bot.send_message(m.chat.id, answer, parse_mode="HTML")
+            answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, вес участника в кг\n(60.0)"
+            bot.send_message(m.chat.id, answer, reply_markup=types.ReplyKeyboardRemove(), parse_mode="HTML")
             bot.register_next_step_handler(m, weight)
             
             break
@@ -269,25 +275,25 @@ def _weight(m):
 #             print(lett, weight_check)
         weight_check = float(weight_check)
         if 0 < weight_check < 333:
-            information[m.from_user.id].append(weight_check)
+            information[m.from_user.id]["weight"] = weight_check
 
 
             weights_ages = DBMS.execute_read_query(connection, DBMS.select_weights_intervals_age)
             
             for i in weights_ages:
-                if int(i[1].split('-')[0]) <= date.today().year - int(information[m.from_user.id][4]) <= int(i[1].split('-')[1]):
+                if int(i[1].split('-')[0]) <= date.today().year - int(information[m.from_user.id]["year_born"]) <= int(i[1].split('-')[1]):
                     DBMS.id_weights = i[0]
 
             else:
-                if date.today().year - int(information[m.from_user.id][4]) > 50:
+                if date.today().year - int(information[m.from_user.id]["year_born"]) > 50:
                     DBMS.id_weights = 11
 
 
             DBMS.weights = DBMS.execute_read_query(connection, DBMS.select_weights_id + str(DBMS.id_weights))
 #             print(DBMS.weights)
-#             print(information[m.from_user.id][4])
+#             print(information[m.from_user.id]["year_born"])
 
-            if date.today().year - int(information[m.from_user.id][4]) <= 11:
+            if date.today().year - int(information[m.from_user.id]["year_born"]) <= 11:
                 print("f")
                 for i in DBMS.weights[0]:
 #                     print(i)
@@ -295,7 +301,7 @@ def _weight(m):
 #                         print("p")
                         if weight_check <= float(i):
                             print(i, "c")
-                            information[m.from_user.id].append(str(i))
+                            information[m.from_user.id]["weight_cat"] = str(i)
                             break
                         
 
@@ -303,7 +309,7 @@ def _weight(m):
 #                         print("o")
                         for i in range(len(DBMS.weights[0])-1, 0, -1):
                             if DBMS.weights[0][i] != '':
-                                information[m.from_user.id].append(str(DBMS.weights[0][i]))
+                                information[m.from_user.id]["weight_cat"] = str(DBMS.weights[0][i])
                                 break
 
                         break    
@@ -311,39 +317,39 @@ def _weight(m):
                 else:
                     for i in range(len(DBMS.weights[0])-1, 0, -1):
                         if DBMS.weights[0][i] != '':
-                            information[m.from_user.id].append(str(DBMS.weights[0][i]))
+                            information[m.from_user.id]["weight_cat"] = str(DBMS.weights[0][i])
                             break
 
                     
 
-            elif date.today().year - int(information[m.from_user.id][4]) > 11:
+            elif date.today().year - int(information[m.from_user.id]["year_born"]) > 11:
 #                 print("f")
                 for i in DBMS.weights[0]:
 #                     print(i)
                     try:
-#                         print(float(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")]))
-                        if weight_check <= float(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")]):
+#                         print(float(i.split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")]))
+                        if weight_check <= float(i.split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")]):
 #                             print(i, "c")
-                            information[m.from_user.id].append(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")])
+                            information[m.from_user.id]["weight_cat"] = i.split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")]
                             break
                     
 
                     except ValueError:
 #                         print("i")
                         
-                        if i.split("/")[0+int(information[m.from_user.id][3] == "Женский")] == '':
+                        if i.split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")] == '':
 #                             print("98")
                             for i in range(len(DBMS.weights[0])-1, 0, -1):
-                                if DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id][3] == "Женский")] != '':
-                                    information[m.from_user.id].append(str(DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id][3] == "Женский")]))
+                                if DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")] != '':
+                                    information[m.from_user.id]["weight_cat"] = str(DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")])
                                     break
 
                         else:
 #                             print("y")
                             #for i in range(len(DBMS.weights[0])-1, 0, -1):
-#                             print(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")], "u")
-                                #if DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id][3] == "Женский")] != '':
-                            information[m.from_user.id].append(i.split("/")[0+int(information[m.from_user.id][3] == "Женский")])
+#                             print(i.split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")], "u")
+                                #if DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")] != '':
+                            information[m.from_user.id]["weight_cat"] = i.split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")]
                                     #break
 
                         break
@@ -352,8 +358,8 @@ def _weight(m):
                 else:
 #                     print("q")
                     for i in range(len(DBMS.weights[0])-1, 0, -1):
-                        if DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id][3] == "Женский")] != '':
-                            information[m.from_user.id].append(str(DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id][3] == "Женский")]))
+                        if DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")] != '':
+                            information[m.from_user.id]["weight_cat"] = str(DBMS.weights[0][i].split("/")[0+int(information[m.from_user.id]["sex"] == "Женский")])
                             break
             
         else:
@@ -364,10 +370,10 @@ def _weight(m):
         lst_of_but = []
 
         for i in ages:
-            if i[0] <= date.today().year - int(information[m.from_user.id][4]) <= i[1]:
+            if i[0] <= date.today().year - int(information[m.from_user.id]["year_born"]) <= i[1]:
                 lst_of_but.append(i[2])
 
-        information[m.from_user.id].append(lst_of_but)
+        information[m.from_user.id]["buttons"] = lst_of_but
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
         for i in lst_of_but:
@@ -378,7 +384,7 @@ def _weight(m):
         bot.register_next_step_handler(m, belt)
     
     except:
-        answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60)"
+        answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60.0)"
         bot.send_message(m.chat.id, answer)
         bot.register_next_step_handler(m, weight)
     return True
@@ -397,10 +403,8 @@ def weight(m):
 @exch.exceptioHandlerBot(level=0)
 def _belt(m):
 #     print(information[m.from_user.id])
-    if m.text.strip() in information[m.from_user.id][7]:
-        information[m.from_user.id].pop(7)
-
-        information[m.from_user.id].append(m.text.strip())
+    if m.text.strip() in information[m.from_user.id]["buttons"]:
+        information[m.from_user.id]["belt"] = m.text.strip()
 
         markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
         lst_of_but = ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium", "Другая команда"]
@@ -414,7 +418,7 @@ def _belt(m):
         
 
     else:
-        answer = "<u><i><b>ВЫБЕРИТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
+        answer = "<u><i><b>НАЖИМАЙТЕ</b></i></u>, пожалуйста, на кнопки, иначе я Вас не понимаю!"
         bot.send_message(m.chat.id, answer, parse_mode="HTML")
         bot.register_next_step_handler(m, belt)
     return True
@@ -433,7 +437,7 @@ def belt(m):
 @exch.exceptioHandlerBot(level=0)   
 def _team(m):
     if m.text.strip() in ["Strela", "Legion", "Universal Jiu Jitsu", "Sport Generation","Killer Bunny BJJ", "Dragons Den Russia", "Octobus", "Gymnasium"]:
-        information[m.from_user.id].append(m.text.strip())
+        information[m.from_user.id]["team"] = m.text.strip()
 
         answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, фамилию и имя тренера"
         bot.send_message(m.chat.id, answer, parse_mode="HTML")
@@ -463,7 +467,7 @@ def team(m):
 
 @exch.exceptioHandlerBot(level=0)
 def _other_team(m):
-    information[m.from_user.id].append(m.text.strip())
+    information[m.from_user.id]["team"] = m.text.strip()
     
     answer = "<u><i><b>НАПИШИТЕ</b></i></u>, пожалуйста, фамилию и имя тренера"
     bot.send_message(m.chat.id, answer, parse_mode="HTML")
@@ -481,14 +485,14 @@ def other_team(m):
 
 @exch.exceptioHandlerBot(level=0)
 def _trainer(m):
-    information[m.from_user.id].append(m.text.strip())
+    information[m.from_user.id]["trainer"] = m.text.strip()
 
     markup=types.ReplyKeyboardMarkup(resize_keyboard=True)
     lst_of_but = ["Всё корректно", "Не всё корректно"]
     for i in lst_of_but:
         markup.add(types.KeyboardButton(i))
 
-    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id][0]}\nИмя: {information[m.from_user.id][1]}\nОтчество: {information[m.from_user.id][2]}\nПол: {information[m.from_user.id][3]}\nГод рождения: {information[m.from_user.id][4]}\nВес: {information[m.from_user.id][5]}\nПояс: {information[m.from_user.id][7]}\nКоманда: {information[m.from_user.id][8]}\nТренер: {information[m.from_user.id][9]}"
+    answer = f"Проверьте достоверность информации\nФамилия: {information[m.from_user.id]['surname']}\nИмя: {information[m.from_user.id]['name']}\nОтчество: {information[m.from_user.id]['patronymic']}\nПол: {information[m.from_user.id]['sex']}\nГод рождения: {information[m.from_user.id]['year_born']}\nВес: {information[m.from_user.id]['weight']}\nПояс: {information[m.from_user.id]['belt']}\nКоманда: {information[m.from_user.id]['team']}\nТренер: {information[m.from_user.id]['trainer']}"
     bot.send_message(m.chat.id, answer, reply_markup=markup)
     bot.register_next_step_handler(m, check)
     return True
@@ -507,11 +511,14 @@ def trainer(m):
 @exch.exceptioHandlerBot(level=0)
 def _check(m):
     if m.text.strip() == 'Всё корректно':
+        #print(tuple(information[m.from_user.id].values())[:6] + tuple(information[m.from_user.id].values())[8:])
+        
         q = 0
         while True:
             
             try:
-                info = (f'{m.from_user.id}_{q}', ) + tuple(information[m.from_user.id][:6]) + tuple(information[m.from_user.id][7:])
+                
+                info = (f'{m.from_user.id}_{q}', ) + tuple(information[m.from_user.id].values())[:6] + tuple(information[m.from_user.id].values())[8:]
                 DBMS.add_information_in_competitors(connection, info)
                 break
 
@@ -537,7 +544,7 @@ def _check(m):
             for i in lst_of_but:
                 markup.add(types.KeyboardButton(i))
             
-            information[m.from_user.id] = []
+            information[m.from_user.id] = {}
 
             answer = "Вы успешно зарегистрировались"
             bot.send_message(m.chat.id, answer, reply_markup=markup)
@@ -782,7 +789,7 @@ def _new_value(m):
 
             
         except:
-            answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60)"
+            answer = "Вес введен некорректно! Попытайтесь ещё раз.\n(Пример: 60.0)"
             bot.send_message(m.chat.id, answer)
 
             val_pass = False

@@ -169,7 +169,19 @@ VALUES
 delete = "DELETE FROM competitors WHERE id >= 0"
 
 
-select_competitors = "SELECT * from competitors"
+select_competitors = """
+SELECT
+    surname,
+    name,
+    patronymic,
+    sex,
+    age,
+    weight,
+    belt,
+    team,
+    trainer
+FROM 
+    competitors"""
 
 
 select_competitors_in_categories = """
